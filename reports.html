@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Reports</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    .toolbar {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .btn-export {
+      padding: 0.65rem 1.2rem;
+      background: #22c55e;
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn-export:hover {
+      filter: brightness(1.05);
+    }
+    .report-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .report-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: start;
+      padding: 1.1rem 1.25rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .report-item h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.05rem;
+      color: #fbbf24;
+    }
+    .report-meta {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(96, 165, 250, 0.25);
+      color: #93c5fd;
+      margin-top: 0.5rem;
+    }
+    .btn-delete {
+      padding: 0.5rem 0.9rem;
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      align-self: start;
+    }
+    .btn-delete:hover {
+      background: rgba(239, 68, 68, 0.35);
+    }
+    .empty-state {
+      color: #94a3b8;
+      margin: 0;
+    }
+    @media (max-width: 760px) {
+      .report-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="body-gradient">
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="hero">
+      <h1>Reports</h1>
+      <p>Detection runs from <strong>Detect Crop</strong> are saved in this browser. Export them as CSV or remove entries you no longer need.</p>
+
+      <div class="toolbar">
+        <button type="button" class="btn-export" id="exportCsv">Export as CSV</button>
+      </div>
+
+      <div class="card">
+        <h2>Saved detections</h2>
+        <div id="reportList" class="report-list"></div>
+      </div>
+    </section>
+
+    <footer class="site-footer">AgriTech — Smart Crop Detective — intelligent farming for a more resilient tomorrow.</footer>
+  </div>
+
+  <script type="module">
+    import { renderNav } from "./nav.js";
+    import { checkAuth } from "./auth-guard.js";
+
+    checkAuth();
+    renderNav("reports");
+
+    const STORAGE_KEY = "agritech_reports";
+
+    function loadReports() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const list = JSON.parse(raw || "[]");
+        return Array.isArray(list) ? list : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveReports(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? iso : d.toLocaleString();
+    }
+
+    function confidenceLabel(c) {
+      if (c == null || Number.isNaN(c)) return "—";
+      return (c <= 1 ? (c * 100).toFixed(1) : c) + "%";
+    }
+
+    function render() {
+      const container = document.getElementById("reportList");
+      const items = loadReports();
+      if (!items.length) {
+        container.innerHTML =
+          '<p class="empty-state">No detections yet. Run <a href="detect.html" style="color:#60a5fa;">Detect Crop</a> to build your history.</p>';
+        return;
+      }
+      container.innerHTML = "";
+      items.forEach((entry) => {
+        const div = document.createElement("div");
+        div.className = "report-item";
+        div.dataset.id = entry.id;
+        div.innerHTML = `
+          <div>
+            <h3>${escapeHtml(entry.disease || "Unknown")}</h3>
+            <p class="report-meta">
+              <strong>Date:</strong> ${escapeHtml(formatDate(entry.timestamp))}<br>
+              <strong>Image:</strong> ${escapeHtml(entry.imageFilename || "—")}
+            </p>
+            <span class="badge">Confidence: ${escapeHtml(confidenceLabel(entry.confidence))}</span>
+          </div>
+          <button type="button" class="btn-delete" data-id="${escapeAttr(entry.id)}">Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s) {
+      if (s == null) return "";
+      const d = document.createElement("div");
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function escapeAttr(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    }
+
+    function toCsv(rows) {
+      const headers = ["id", "timestamp", "disease", "confidence", "imageFilename"];
+      const lines = [headers.join(",")];
+      rows.forEach((r) => {
+        const cells = headers.map((h) => {
+          let v = r[h];
+          if (v == null) v = "";
+          const str = String(v);
+          if (/[",\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+          return str;
+        });
+        lines.push(cells.join(","));
+      });
+      return lines.join("\n");
+    }
+
+    document.getElementById("exportCsv").addEventListener("click", () => {
+      const rows = loadReports();
+      if (!rows.length) return;
+      const csv = toCsv(rows);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "agritech-reports.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("reportList").addEventListener("click", (e) => {
+      const btn = e.target.closest(".btn-delete");
+      if (!btn) return;
+      const id = btn.getAttribute("data-id");
+      const next = loadReports().filter((r) => String(r.id) !== String(id));
+      saveReports(next);
+      render();
+    });
+
+    document.addEventListener("DOMContentLoaded", render);
+  </script>
+</body>
+</html>

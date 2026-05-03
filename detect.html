@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Detect Crop</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    :root {
+      --accent: #fbbf24;
+      --success: #4ade80;
+      --danger: #f87171;
+      --border: rgba(148, 163, 184, 0.25);
+    }
+    .detect-form {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .file-input {
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+    }
+    #previewImg {
+      max-width: 100%;
+      max-height: 240px;
+      border-radius: 12px;
+      margin-top: 1rem;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+    .quality-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.14);
+      color: #fecaca;
+      width: fit-content;
+    }
+    .camera-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    #cameraBtn,
+    #snapBtn {
+      width: fit-content;
+    }
+    #cameraStream,
+    #snapCanvas {
+      width: 100%;
+      max-height: 240px;
+      border-radius: 12px;
+      margin-top: 0.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+    }
+    #resultBox {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: none;
+    }
+    .result-crop {
+      font-size: 0.9rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .result-disease {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      line-height: 1.25;
+    }
+    .result-disease.healthy { color: var(--success); }
+    .confidence-bar-wrap {
+      margin-bottom: 1.1rem;
+    }
+    .result-section {
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .result-section h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--accent);
+      margin: 0 0 0.4rem;
+    }
+    .result-section p {
+      margin: 0;
+      font-size: 0.93rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .result-error {
+      color: var(--danger);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    #spinner {
+      margin-top: 1.5rem;
+      padding: 1.5rem 1rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+    }
+
+    .spin-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 4px solid rgba(255, 255, 255, 0.18);
+      border-top-color: var(--accent);
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── AI Advice Card ─────────────────────────────────── */
+    #adviceSection {
+      margin-top: 1.5rem;
+    }
+    #getAdviceBtn {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+    }
+    #getAdviceBtn:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      transform: translateY(-1px);
+    }
+    #adviceCard {
+      margin-top: 1rem;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .advice-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.25);
+    }
+    .advice-tab {
+      flex: 1;
+      padding: 0.65rem 1rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .advice-tab.active {
+      color: #a78bfa;
+      background: rgba(99, 102, 241, 0.12);
+      border-bottom: 2px solid #8b5cf6;
+    }
+    .advice-panel {
+      padding: 1.1rem 1.2rem;
+      display: none;
+    }
+    .advice-panel.active { display: block; }
+    .urgency-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .urgency-high  { background: rgba(248,113,113,0.15); color: #fca5a5; border: 1px solid rgba(248,113,113,0.35); }
+    .urgency-medium { background: rgba(251,191,36,0.15); color: #fde68a; border: 1px solid rgba(251,191,36,0.35); }
+    .urgency-low   { background: rgba(74,222,128,0.15); color: #86efac; border: 1px solid rgba(74,222,128,0.35); }
+    .advice-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a78bfa;
+      margin: 0.9rem 0 0.45rem;
+    }
+    .advice-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .advice-list li {
+      display: flex;
+      gap: 0.6rem;
+      font-size: 0.93rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .advice-list li::before {
+      content: attr(data-icon);
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+    #adviceSpinner {
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .spin-sm {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #a78bfa;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    #imagePreview {
+      margin-top: 1rem;
+      padding: 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      text-align: center;
+      display: none;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    #imagePreview img {
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 10px;
+      border: 2px solid var(--accent);
+      object-fit: cover;
+      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.18);
+    }
+    #previewFilename {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0.5rem 0 0;
+      word-break: break-all;
+    }
+    .model-warning-banner {
+      background: rgba(255, 152, 0, 0.12);
+      border: 1px solid rgba(255, 152, 0, 0.4);
+      color: #ffcc80;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      line-height: 1.5;
+    }
+    .model-warning-banner a {
+      color: #fbbf24;
+      text-decoration: underline;
+    }
+    .api-error-banner {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      color: #fecaca;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      display: none;
+      align-items: flex-start;
+      gap: 0.6rem;
+      line-height: 1.6;
+    }
+    .api-error-banner.visible {
+      display: flex;
+    }
+    .api-error-banner strong {
+      color: #f87171;
+    }
+  </style>
+</head>
+<body class="body-gradient">
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="hero">
+      <h1>Detect Crop</h1>
+      <p>Upload a crop image for diagnosis. AgriTech — Smart Crop Detective analyzes leaf patterns for a fast result.</p>
+
+      <div id="modelWarningBanner"></div>
+
+      <div class="card">
+        <h2>Upload or Capture</h2>
+        <p>Upload a crop image here to scan your plants and detect diseases.</p>
+        <form id="detectForm" class="detect-form">
+          <input type="file" id="imageInput" class="file-input" accept="image/*" required />
+          <!-- Image preview (shown immediately on file select) -->
+          <div id="imagePreview">
+            <img id="previewImg" alt="Selected crop preview" />
+            <p id="previewFilename"></p>
+          </div>
+          <div id="blurWarning" class="quality-badge hidden">⚠️ Image may be blurry</div>
+          <div class="camera-actions">
+            <button id="cameraBtn" type="button" class="btn">📷 Use Camera</button>
+            <button id="snapBtn" type="button" class="btn hidden">Capture</button>
+          </div>
+          <video id="cameraStream" class="hidden" autoplay playsinline></video>
+          <canvas id="snapCanvas" class="hidden"></canvas>
+          <button type="submit" class="btn">Detect Disease</button>
+        </form>
+        <div id="spinner" class="hidden">
+          <div class="spin-circle"></div>
+          <p>Analyzing your crop...</p>
+        </div>
+        <div id="resultBox"></div>
+
+        <!-- AI Advice Section (shown after successful detection) -->
+        <div id="adviceSection" style="display:none; margin-top:1.25rem; border-top: 1px solid var(--border); padding-top:1.25rem;">
+          <button id="getAdviceBtn" class="btn" type="button">🤖 Get AI Treatment &amp; Prevention Advice</button>
+          <div id="adviceCard" style="display:none;">
+            <div id="adviceSpinner" style="display:none;">
+              <div class="spin-sm"></div> Consulting Gemini AI...
+            </div>
+            <div id="adviceContent" style="display:none;">
+              <div class="advice-tabs">
+                <button class="advice-tab active" data-lang="en" type="button">🇬🇧 English</button>
+                <button class="advice-tab" data-lang="hi" type="button">🇮🇳 हिन्दी</button>
+              </div>
+              <div class="advice-panel active" id="panel-en"></div>
+              <div class="advice-panel" id="panel-hi"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">AgriTech — Smart Crop Detective — intelligent farming for a more resilient tomorrow.</footer>
+  </div>
+
+  <script type="module">
+    import { renderNav } from "./nav.js";
+    import { checkAuth } from "./auth-guard.js";
+    import { detect as detectApi } from "./api.js";
+
+    checkAuth();
+    renderNav("detect");
+
+    // ── Health check: warn if models are not ready ──────────────────────
+    (async () => {
+      try {
+        const h = await fetch("/api/health").then(r => r.json());
+        if (!h.gemini_configured) {
+          const banner = document.createElement("div");
+          banner.className = "model-warning-banner";
+          banner.innerHTML =
+            `⚠️ <span><strong>Detection unavailable:</strong> 
+            Set <code>GEMINI_API_KEY</code> in your <code>.env</code> file and restart the server.</span>`;
+          document.getElementById("modelWarningBanner").appendChild(banner);
+        }
+      } catch (_) { /* silently ignore if server is starting up */ }
+    })();
+
+    const BLUR_THRESHOLD = 80.0;
+    const detectForm = document.getElementById("detectForm");
+    const fileInput = document.getElementById("imageInput");
+    const previewImg = document.getElementById("previewImg");
+    const blurWarning = document.getElementById("blurWarning");
+    const cameraBtn = document.getElementById("cameraBtn");
+    const snapBtn = document.getElementById("snapBtn");
+    const cameraStream = document.getElementById("cameraStream");
+    const snapCanvas = document.getElementById("snapCanvas");
+    let previewUrl = null;
+    let activeCameraMediaStream = null;
+
+    function escapeHtml(s) {
+      if (s == null) return "";
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function saveReportEntry(imageFile, disease, confidenceValue) {
+      const key = "agritech_reports";
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem(key) || "[]");
+        if (!Array.isArray(list)) list = [];
+      } catch {
+        list = [];
+      }
+      const id =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `r-${Date.now()}`;
+      list.unshift({
+        id,
+        timestamp: new Date().toISOString(),
+        disease: disease || "Unknown",
+        confidence: typeof confidenceValue === "number" ? confidenceValue : null,
+        imageFilename: imageFile && imageFile.name ? imageFile.name : "upload",
+      });
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+
+    function renderReport(report, reportDetailsEl) {
+      if (!report || typeof report !== "object") {
+        reportDetailsEl.innerHTML = "";
+        return;
+      }
+      const labels = {
+        disease: "Disease",
+        causes: "Causes",
+        soil_requirements: "Soil requirements",
+        recommended_fertilizers: "Recommended fertilizers",
+        pesticide_treatments: "Pesticide treatments",
+        soil_moisture: "Soil moisture",
+        preventive_measures: "Preventive measures",
+        additional_recommendations: "Additional recommendations",
+      };
+      const order = [
+        "disease",
+        "causes",
+        "soil_requirements",
+        "recommended_fertilizers",
+        "pesticide_treatments",
+        "soil_moisture",
+        "preventive_measures",
+        "additional_recommendations",
+      ];
+      let html = "";
+      for (const key of order) {
+        const val = report[key];
+        if (val) {
+          html +=
+            '<p style="margin: 0.65rem 0 0 0;"><strong style="color: var(--accent);">' +
+            escapeHtml(labels[key] || key) +
+            '</strong><br><span style="color: var(--muted);">' +
+            escapeHtml(String(val)) +
+            "</span></p>";
+        }
+      }
+      reportDetailsEl.innerHTML =
+        html || '<p style="color: var(--muted);">No extended report fields.</p>';
+    }
+
+    function setSelectedFile(file) {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+    }
+
+    function clearPreviewUrl() {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+      }
+    }
+
+    function stopCameraStream() {
+      if (!activeCameraMediaStream) return;
+      activeCameraMediaStream.getTracks().forEach((track) => track.stop());
+      activeCameraMediaStream = null;
+      cameraStream.srcObject = null;
+    }
+
+    function computeSharpness(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          const grayscale = new Float32Array(canvas.width * canvas.height);
+          for (let i = 0, p = 0; i < imageData.length; i += 4, p += 1) {
+            grayscale[p] =
+              0.299 * imageData[i] +
+              0.587 * imageData[i + 1] +
+              0.114 * imageData[i + 2];
+          }
+
+          let sum = 0;
+          let sumSq = 0;
+          let count = 0;
+          for (let y = 1; y < canvas.height - 1; y += 1) {
+            for (let x = 1; x < canvas.width - 1; x += 1) {
+              const idx = y * canvas.width + x;
+              const laplacian =
+                -4 * grayscale[idx] +
+                grayscale[idx - 1] +
+                grayscale[idx + 1] +
+                grayscale[idx - canvas.width] +
+                grayscale[idx + canvas.width];
+              sum += laplacian;
+              sumSq += laplacian * laplacian;
+              count += 1;
+            }
+          }
+
+          URL.revokeObjectURL(objectUrl);
+          const variance = count > 0 ? sumSq / count - (sum / count) ** 2 : 0;
+          resolve(variance);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("Could not inspect image quality."));
+        };
+        img.src = objectUrl;
+      });
+    }
+
+    async function updatePreview(file) {
+      clearPreviewUrl();
+      if (!file) {
+        previewImg.classList.add("hidden");
+        blurWarning.classList.add("hidden");
+        return;
+      }
+
+      previewUrl = URL.createObjectURL(file);
+      previewImg.src = previewUrl;
+      previewImg.classList.remove("hidden");
+
+      try {
+        const sharpness = await computeSharpness(file);
+        blurWarning.classList.toggle("hidden", sharpness >= BLUR_THRESHOLD);
+      } catch (error) {
+        blurWarning.classList.add("hidden");
+      }
+    }
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (file) {
+        // Populate filename/size label and show preview container
+        document.getElementById("previewFilename").textContent =
+          file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+        document.getElementById("imagePreview").style.display = "block";
+        // Clear stale detection results when a new image is chosen
+        document.getElementById("resultBox").style.display = "none";
+        resetAdvice();
+      } else {
+        document.getElementById("imagePreview").style.display = "none";
+      }
+      await updatePreview(file);
+    });
+
+    cameraBtn.addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false,
+        });
+        stopCameraStream();
+        activeCameraMediaStream = stream;
+        cameraStream.srcObject = stream;
+        
+        // Dynamically mirror if front-facing or unknown (desktop webcams)
+        const track = stream.getVideoTracks()[0];
+        const settings = track.getSettings();
+        if (settings.facingMode === 'user' || !settings.facingMode) {
+          cameraStream.style.transform = 'scaleX(-1)';
+        } else {
+          cameraStream.style.transform = 'none';
+        }
+
+        cameraStream.classList.remove("hidden");
+        snapBtn.classList.remove("hidden");
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    snapBtn.addEventListener("click", async () => {
+      if (!cameraStream.srcObject) return;
+      const width = cameraStream.videoWidth || 1280;
+      const height = cameraStream.videoHeight || 720;
+      snapCanvas.width = width;
+      snapCanvas.height = height;
+      const ctx = snapCanvas.getContext("2d");
+      
+      // Mirror canvas context if video is mirrored
+      if (cameraStream.style.transform === 'scaleX(-1)') {
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+      }
+      
+      ctx.drawImage(cameraStream, 0, 0, width, height);
+      snapCanvas.classList.remove("hidden");
+
+      const blob = await new Promise((resolve) =>
+        snapCanvas.toBlob(resolve, "image/jpeg", 0.92)
+      );
+      if (!blob) return;
+
+      const capturedFile = new File([blob], `camera-capture-${Date.now()}.jpg`, {
+        type: "image/jpeg",
+      });
+      setSelectedFile(capturedFile);
+      await updatePreview(capturedFile);
+      stopCameraStream();
+      cameraStream.classList.add("hidden");
+      snapBtn.classList.add("hidden");
+    });
+
+    // ── AI Advice logic ───────────────────────────────────────────
+    const adviceSection  = document.getElementById("adviceSection");
+    const adviceCard     = document.getElementById("adviceCard");
+    const adviceSpinner  = document.getElementById("adviceSpinner");
+    const adviceContent  = document.getElementById("adviceContent");
+    const getAdviceBtn   = document.getElementById("getAdviceBtn");
+    const panelEn        = document.getElementById("panel-en");
+    const panelHi        = document.getElementById("panel-hi");
+    let   lastDiseaseForAdvice = null;
+    let   lastCropTypeForAdvice = null;
+
+    function cleanClassName(raw) {
+      if (!raw) return raw;
+      if (raw.includes("___")) {
+        const parts = raw.split("___");
+        const disease = parts[1].replace(/_/g, " ").trim();
+        return disease.charAt(0).toUpperCase() + disease.slice(1);
+      }
+      return raw.replace(/_/g, " ");
+    }
+
+    function resetAdvice() {
+      adviceSection.style.display = "none";
+      adviceCard.style.display    = "none";
+      adviceSpinner.style.display = "none";
+      adviceContent.style.display = "none";
+      panelEn.innerHTML = "";
+      panelHi.innerHTML = "";
+      getAdviceBtn.disabled = false;
+      getAdviceBtn.textContent = "🤖 Get AI Treatment & Prevention Advice";
+      lastDiseaseForAdvice  = null;
+      lastCropTypeForAdvice = null;
+    }
+
+    function urgencyClass(u) {
+      const s = String(u).toLowerCase();
+      if (s === "high"   || s === "उच्च")   return "urgency-high";
+      if (s === "medium" || s === "मध्यम") return "urgency-medium";
+      return "urgency-low";
+    }
+    function urgencyIcon(u) {
+      const s = String(u).toLowerCase();
+      if (s === "high"   || s === "उच्च")   return "🔴";
+      if (s === "medium" || s === "मध्यम") return "🟡";
+      return "🟢";
+    }
+
+    function renderAdvicePanel(panel, data) {
+      if (!data) { panel.innerHTML = "<p style='color:var(--muted)'>No data.</p>"; return; }
+      const u = data.urgency || "";
+      let html = `<span class="urgency-badge ${urgencyClass(u)}">${urgencyIcon(u)} ${escapeHtml(u)}</span>`;
+
+      const treatment  = Array.isArray(data.treatment)  ? data.treatment  : [];
+      const prevention = Array.isArray(data.prevention) ? data.prevention : [];
+
+      if (treatment.length) {
+        html += `<p class="advice-section-title">💊 Treatment</p><ul class="advice-list">`;
+        treatment.forEach((t, i) => {
+          html += `<li data-icon="${i + 1}.">${escapeHtml(t)}</li>`;
+        });
+        html += `</ul>`;
+      }
+      if (prevention.length) {
+        html += `<p class="advice-section-title">🛡️ Prevention</p><ul class="advice-list">`;
+        prevention.forEach(p => {
+          html += `<li data-icon="✓">${escapeHtml(p)}</li>`;
+        });
+        html += `</ul>`;
+      }
+      panel.innerHTML = html;
+    }
+
+    document.querySelectorAll(".advice-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".advice-tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".advice-panel").forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById("panel-" + tab.dataset.lang).classList.add("active");
+      });
+    });
+
+    getAdviceBtn.addEventListener("click", async () => {
+      if (!lastDiseaseForAdvice) return;
+      getAdviceBtn.disabled = true;
+      getAdviceBtn.textContent = "Fetching advice...";
+      adviceCard.style.display    = "block";
+      adviceSpinner.style.display = "flex";
+      adviceContent.style.display = "none";
+
+      try {
+        const rawClass    = window._lastDetectionResult?.raw_class || lastDiseaseForAdvice;
+        const cleanDisease = cleanClassName(rawClass);
+        const cropType    = window._lastDetectionResult?.crop_type || lastCropTypeForAdvice || "Unknown";
+        const res  = await fetch("/api/advice", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ disease: cleanDisease, crop_type: cropType }),
+        });
+        const data = await res.json().catch(() => ({}));
+
+        adviceSpinner.style.display = "none";
+
+        if (!res.ok || data.error) {
+          adviceContent.style.display = "block";
+          panelEn.innerHTML = `<p style="color:var(--danger)">${escapeHtml(data.error || data.message || "Failed to get advice.")}</p>`;
+          panelHi.innerHTML = panelEn.innerHTML;
+          getAdviceBtn.textContent = "🤖 Retry AI Advice";
+          getAdviceBtn.disabled = false;
+          return;
+        }
+
+        const advice = data.advice || {};
+        renderAdvicePanel(panelEn, advice.english);
+        renderAdvicePanel(panelHi, advice.hindi);
+        adviceContent.style.display = "block";
+        getAdviceBtn.textContent = "🔄 Refresh AI Advice";
+        getAdviceBtn.disabled = false;
+      } catch (err) {
+        adviceSpinner.style.display = "none";
+        adviceContent.style.display = "block";
+        panelEn.innerHTML = `<p style="color:var(--danger)">Network error: ${escapeHtml(err.message)}</p>`;
+        panelHi.innerHTML = panelEn.innerHTML;
+        getAdviceBtn.textContent = "🤖 Retry AI Advice";
+        getAdviceBtn.disabled = false;
+      }
+    });
+    // ── end AI Advice logic ───────────────────────────────────────
+
+    function renderResult(data, isError, errorMsg) {
+      const resultBox = document.getElementById("resultBox");
+      if (isError) {
+        resultBox.innerHTML = `<p class="result-error">⚠️ ${escapeHtml(errorMsg || "Detection failed.")}</p>`;
+        resultBox.style.display = "block";
+        return;
+      }
+      const conf     = typeof data.confidence === "number" ? data.confidence : parseFloat(data.confidence);
+      const pct      = Number.isFinite(conf) ? Math.round(conf * 100) : 0;
+      const barColor = pct >= 85 ? "#4ade80" : pct >= 65 ? "#fbbf24" : "#f87171";
+      const disease  = data.disease_detected || "Unknown";
+      const isHealthy = disease.toLowerCase().includes("healthy");
+      const report   = data.report || {};
+
+      const sec = (icon, title, text) => text
+        ? `<div class="result-section"><h4>${icon} ${title}</h4><p>${escapeHtml(text)}</p></div>`
+        : "";
+
+      resultBox.innerHTML = `
+        <div class="result-crop">🌱 ${escapeHtml(data.crop_type || "Unknown Crop")}</div>
+        <div class="result-disease${isHealthy ? " healthy" : ""}">${escapeHtml(disease)}</div>
+        <div class="confidence-bar-wrap">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:0.82rem;color:var(--muted)">Confidence</span>
+            <span style="font-size:0.82rem;font-weight:700;color:${barColor}">${pct}%</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:8px;overflow:hidden">
+            <div style="width:${pct}%;background:${barColor};height:100%;border-radius:8px;transition:width 0.8s ease"></div>
+          </div>
+        </div>
+        ${sec("📋", "Description",  report.description)}
+        ${sec("⚠️", "Causes",        report.causes)}
+        ${sec("💊", "Treatment",     report.pesticide_treatments)}
+        ${sec("🛡️", "Prevention",   report.preventive_measures)}
+        ${sec("🌿", "Soil & Moisture", report.soil_moisture)}
+        ${sec("🧪", "Fertilizers",   report.recommended_fertilizers)}
+        ${sec("💡", "Additional Tips", report.additional_recommendations)}
+      `;
+      resultBox.style.display = "block";
+    }
+
+    detectForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const resultBox = document.getElementById("resultBox");
+      const spinner   = document.getElementById("spinner");
+
+      if (spinner) spinner.classList.remove("hidden");
+      resultBox.style.display = "none";
+      resetAdvice();
+
+      try {
+        const { res, data } = await detectApi(formData);
+        const errText   = data.error || data.message || "Failed to analyze image.";
+        const isApiError = !res.ok || data.status === "error";
+
+        if (spinner) spinner.classList.add("hidden");
+
+        if (isApiError) {
+          renderResult(null, true, errText);
+          return;
+        }
+
+        renderResult(data, false);
+
+        const disease = data.disease_detected ?? "";
+        const conf    = typeof data.confidence === "number" ? data.confidence : parseFloat(data.confidence);
+        saveReportEntry(file, disease, Number.isFinite(conf) ? conf : null);
+
+        // Store full result for the advice handler
+        window._lastDetectionResult = data;
+        lastDiseaseForAdvice  = cleanClassName(data.raw_class || disease);
+        lastCropTypeForAdvice = data.crop_type || "Unknown";
+        adviceSection.style.display = "block";
+
+      } catch (error) {
+        console.error(error);
+        if (spinner) spinner.classList.add("hidden");
+        renderResult(null, true, "Network error — please try again.");
+      } finally {
+        clearPreviewUrl();
+        stopCameraStream();
+        document.getElementById("imagePreview").style.display = "none";
+        blurWarning.classList.add("hidden");
+        cameraStream.classList.add("hidden");
+        snapCanvas.classList.add("hidden");
+        snapBtn.classList.add("hidden");
+      }
+    });
+  </script>
+</body>
+</html>

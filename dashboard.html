@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Home</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    :root {
+      --bg: #05060d;
+      --panel: rgba(15, 23, 42, 0.92);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --primary: #60a5fa;
+      --primary-strong: #38bdf8;
+      --accent: #fde047;
+      --success: #22c55e;
+      --surface: #0f172a;
+      --border: rgba(148, 163, 184, 0.16);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+    }
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #020409 0%, #07101a 45%, #0c1727 100%);
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 12% 20%, rgba(59, 130, 246, 0.12), transparent 18%), radial-gradient(circle at 85% 12%, rgba(250, 204, 21, 0.1), transparent 20%), radial-gradient(circle at 45% 75%, rgba(16, 185, 129, 0.08), transparent 18%);
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(14px);
+    }
+    body.dark {
+      background: linear-gradient(135deg, #020409 0%, #07101a 45%, #0c1727 100%);
+      color: #e2e8f0;
+    }
+    body.dark::before {
+      background: radial-gradient(circle at 20% 25%, rgba(59, 130, 246, 0.12), transparent 18%), radial-gradient(circle at 90% 65%, rgba(250, 204, 21, 0.1), transparent 20%);
+    }
+    body.dark .panel,
+    body.dark .navbar,
+    body.dark .status-card,
+    body.dark .voice-panel,
+    body.dark .section-card {
+      background: rgba(15, 23, 42, 0.95);
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.16);
+    }
+    body.dark .nav-link,
+    body.dark .nav-link.active,
+    body.dark .status-title,
+    body.dark .voice-panel h2,
+    body.dark .section-card h2 {
+      color: #e2e8f0;
+    }
+    body.dark .search-input {
+      background: #0b1220;
+      color: #e2e8f0;
+    }
+    body.dark .search-input::placeholder {
+      color: #94a3b8;
+    }
+    body.dark .btn-primary {
+      background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+      color: #0f172a;
+    }
+    body.dark .toggle {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+    }
+    body.light-mode {
+      background: #ffffff;
+      color: #0f172a;
+    }
+    body.light-mode::before {
+      background: radial-gradient(circle at 20% 25%, rgba(59, 130, 246, 0.08), transparent 18%), radial-gradient(circle at 90% 65%, rgba(250, 204, 21, 0.08), transparent 20%);
+    }
+    body.light-mode .panel,
+    body.light-mode .navbar,
+    body.light-mode .status-card,
+    body.light-mode .voice-panel,
+    body.light-mode .section-card,
+    body.light-mode .camera-box {
+      background: rgba(248, 250, 252, 0.96);
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.08);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
+    }
+    body.light-mode .brand {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border-color: rgba(15, 23, 42, 0.08);
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+    }
+    body.light-mode .brand span:last-child,
+    body.light-mode .nav-link,
+    body.light-mode .status-title,
+    body.light-mode .voice-panel h2,
+    body.light-mode .section-card h2,
+    body.light-mode .panel h1 {
+      color: #0f172a;
+    }
+    body.light-mode .panel p,
+    body.light-mode .status-value,
+    body.light-mode .camera-hint,
+    body.light-mode .section-card ul,
+    body.light-mode footer p {
+      color: #475569;
+    }
+    body.light-mode .search-input {
+      background: transparent;
+      color: #0f172a;
+    }
+    body.light-mode .search-input::placeholder {
+      color: #64748b;
+    }
+    body.light-mode .toggle,
+    body.light-mode .lang-select,
+    body.light-mode .profile-button,
+    body.light-mode .logout-btn {
+      background: rgba(15, 23, 42, 0.05);
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+    body.light-mode .profile-menu {
+      background: rgba(255, 255, 255, 0.98);
+      border-color: rgba(15, 23, 42, 0.08);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+    body.light-mode .profile-menu a {
+      color: #0f172a;
+    }
+    body.light-mode .dashboard-card {
+      box-shadow: 0 30px 70px rgba(59, 130, 246, 0.16);
+    }
+    body.light-mode .dashboard-card-inner,
+    body.light-mode .metric,
+    body.light-mode .hero-notice {
+      background: rgba(255, 255, 255, 0.78);
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+    body.light-mode .metric span:first-child,
+    body.light-mode .hero-notice p {
+      color: #334155;
+    }
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      position: relative;
+      padding-top: 0.75rem;
+    }
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.3rem 0;
+      background: rgba(12, 20, 35, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #f8fafc;
+      font-weight: 700;
+      background: linear-gradient(135deg, #111827, #1f2937);
+      border-radius: 999px;
+      padding: 0.9rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.22);
+    }
+    .brand span:first-child {
+      font-size: 1.35rem;
+    }
+    .brand span:last-child {
+      color: #f8fafc;
+      letter-spacing: 0.02em;
+    }
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-link {
+      color: rgba(242, 242, 247, 0.9);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+    .nav-link.active {
+      background: rgba(251, 191, 36, 0.95);
+      color: #0f172a;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(251, 191, 36, 0.24);
+    }
+    .intro {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+      align-items: stretch;
+      margin-top: 1rem;
+    }
+    .panel {
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+      padding: 2.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel:before {
+      content: "";
+      position: absolute;
+      top: -20%;
+      right: -15%;
+      width: 260px;
+      height: 260px;
+      background: rgba(248, 180, 0, 0.08);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .panel:after {
+      content: "";
+      position: absolute;
+      bottom: -16%;
+      left: -12%;
+      width: 180px;
+      height: 180px;
+      background: rgba(45, 127, 87, 0.08);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .panel h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 3.1rem);
+      line-height: 1.05;
+    }
+    .panel p {
+      color: var(--muted);
+      max-width: 700px;
+      margin-top: 1rem;
+    }
+    .search-row {
+      margin-top: 1.8rem;
+      display: grid;
+      gap: 1rem;
+    }
+    .search-box {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(239, 249, 255, 0.9));
+      border-radius: 18px;
+      border: 1px solid rgba(29, 78, 137, 0.14);
+      padding: 0.85rem 1rem;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.7);
+    }
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 1rem;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    .search-input::placeholder {
+      color: #67778f;
+    }
+    .search-box button {
+      border: none;
+      background: linear-gradient(135deg, #1d4e89, #2d7f57);
+      color: white;
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 18px 30px rgba(29, 78, 137, 0.2);
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .status-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .status-card::after {
+      content: "";
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(45, 127, 87, 0.1);
+      top: -20px;
+      right: -20px;
+      pointer-events: none;
+    }
+    .status-card span {
+      font-size: 1.5rem;
+    }
+    .status-info {
+      line-height: 1.3;
+    }
+    .status-title {
+      margin: 0;
+      font-weight: 700;
+    }
+    .status-value {
+      margin: 0.25rem 0 0;
+      color: var(--muted);
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.8rem;
+    }
+    .btn-primary,
+    .btn-secondary {
+      border: none;
+      border-radius: 999px;
+      padding: 1rem 1.6rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      min-width: 160px;
+    }
+    .camera-scan {
+      position: absolute;
+      inset: 0;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 2;
+    }
+    .scan-line {
+      width: 90%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(29, 78, 137, 0.9), transparent);
+      animation: scan 3s linear infinite;
+      border-radius: 999px;
+    }
+    .scan-label {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .camera-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 6, 13, 0.9);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+    .camera-overlay.hidden {
+      display: none;
+    }
+    .camera-box {
+      width: min(520px, 100%);
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 1.3rem;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+      position: relative;
+      display: grid;
+      gap: 1rem;
+    }
+    .camera-box video {
+      width: 100%;
+      border-radius: 20px;
+      background: #020617;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .close-camera {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      border-radius: 999px;
+      width: 2.5rem;
+      height: 2.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .camera-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      justify-content: center;
+    }
+    .camera-hint {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+    .voice-waveform {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      margin: 1rem 0;
+      min-height: 40px;
+    }
+    .wave-bar {
+      width: 5px;
+      height: 20px;
+      background: #f8b400;
+      border-radius: 999px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.12s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.24s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.36s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.48s; }
+    @keyframes scan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1.6); }
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f8b400 0%, #f6d652 100%);
+      color: var(--text);
+      box-shadow: 0 24px 45px rgba(248, 180, 0, 0.28);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(239, 249, 255, 0.9));
+      color: var(--primary);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+    }
+    .dashboard-card {
+      position: relative;
+      min-height: 520px;
+      border-radius: 32px;
+      background: linear-gradient(180deg, rgba(29, 78, 137, 0.95), rgba(19, 35, 69, 0.98));
+      box-shadow: 0 40px 90px rgba(16, 45, 92, 0.2);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      display: grid;
+      place-items: center;
+    }
+    .dashboard-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(248, 180, 0, 0.28), transparent 28%), radial-gradient(circle at bottom left, rgba(45, 127, 87, 0.22), transparent 28%);
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    .dashboard-scene {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      transform: rotateY(-14deg) rotateX(8deg);
+      transform-style: preserve-3d;
+      perspective: 1200px;
+    }
+    .dashboard-card-inner {
+      position: relative;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(20px);
+      color: white;
+      transform: translateZ(44px);
+      box-shadow: 0 30px 60px rgba(1, 26, 56, 0.25);
+      overflow: hidden;
+    }
+    .dashboard-card-inner:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(248, 180, 0, 0.12), transparent 55%);
+      pointer-events: none;
+    }
+    .dashboard-card-inner h2 {
+      margin: 0;
+      font-size: 1.45rem;
+    }
+    .dashboard-stats {
+      margin-top: 1.3rem;
+      display: grid;
+      gap: 1rem;
+    }
+    .metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .metric span:first-child {
+      color: #cbd5e1;
+    }
+    .metric strong {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .hero-notice {
+      margin-top: 1.5rem;
+      padding: 1rem 1.2rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.95);
+    }
+    .hero-notice p {
+      margin: 0;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      font-weight: 500;
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .section-card {
+      background: rgba(15, 23, 42, 0.93);
+      border-radius: 26px;
+      padding: 1.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 28px 68px rgba(0, 0, 0, 0.25);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .section-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 28px 90px rgba(29, 78, 137, 0.18);
+    }
+    .section-card h2 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+    .section-card ul {
+      padding-left: 1.2rem;
+      margin: 1rem 0 0;
+      color: var(--muted);
+    }
+    .voice-panel {
+      margin-top: 2rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.75rem;
+      border-radius: 24px;
+    }
+    .voice-panel h2 {
+      margin-top: 0;
+      color: var(--text);
+    }
+    .voice-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .voice-row button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.95rem 1.4rem;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .voice-row button:hover {
+      background: #174577;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .footer-status {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 936px;
+      margin: 0 auto 1.5rem;
+      padding: 0 1rem;
+    }
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem 1.2rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      min-height: 76px;
+    }
+    .footer-item span {
+      font-size: 1.4rem;
+    }
+    .footer-item strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+    .footer-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .navbar {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+    }
+    .nav-item:hover {
+      color: #2E7D32;
+    }
+    .active {
+      background: #FBC02D;
+      border-radius: 20px;
+    }
+    .hero {
+      display: block;
+      margin-top: 2rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .hero-panel {
+      padding: 0;
+      position: relative;
+    }
+    .hero-side {
+      display: none;
+    }
+    .hero-image {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      border-radius: 28px;
+      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.35);
+    }
+    .analysis-result {
+      margin-top: 2rem;
+      padding: 1.6rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+    }
+    .analysis-result h2 {
+      margin-top: 0;
+      color: #f8fafc;
+    }
+    .result-preview {
+      width: 100%;
+      max-width: 400px;
+      height: 400px;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      margin: 1rem auto;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px;
+      display: block;
+    }
+    .disease-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .info-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 1.2rem;
+      border-left: 4px solid #60a5fa;
+    }
+    .info-card.disease {
+      border-left-color: #ef4444;
+    }
+    .info-card.soil {
+      border-left-color: #f59e0b;
+    }
+    .info-card.fertilizer {
+      border-left-color: #22c55e;
+    }
+    .info-card.pesticide {
+      border-left-color: #8b5cf6;
+    }
+    .info-card.moisture {
+      border-left-color: #3b82f6;
+    }
+    .info-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .info-card p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .moisture-meter {
+      margin-top: 0.8rem;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .moisture-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #FBC02D, #FFA000);
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(251,192,45,0.4);
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+    }
+    .temp-card {
+      background: linear-gradient(135deg, #ffe0b2, #ffffff);
+    }
+    .humidity-card {
+      background: linear-gradient(135deg, #bbdefb, #ffffff);
+    }
+    .section-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+    .process-diagram {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      text-align: center;
+    }
+    .process-diagram h3 {
+      margin-top: 0;
+      color: #e2e8f0;
+    }
+    .process-diagram pre {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    .process-carousel {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .process-carousel h3 {
+      margin-top: 0;
+      color: #e2e8f0;
+    }
+    .carousel-container {
+      position: relative;
+      height: 250px;
+      overflow: hidden;
+      border-radius: 15px;
+      margin: 1rem 0;
+    }
+    .process-carousel .carousel-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .process-carousel .carousel-image.active {
+      opacity: 1;
+    }
+    .process-carousel .carousel-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .process-carousel .indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .process-carousel .indicator.active {
+      background: #60a5fa;
+    }
+    .top-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .lang-select {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .lang-select:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .lang-select:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+    }
+    .toggle {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.8), rgba(59, 130, 246, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+    }
+    .toggle:hover {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 1), rgba(59, 130, 246, 1));
+      transform: scale(1.05) translateY(-1px);
+      box-shadow: 0 6px 16px rgba(96, 165, 250, 0.4);
+    }
+    .logout-btn {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      margin-left: 0.5rem;
+    }
+    .logout-btn:hover {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 1));
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+    .profile {
+      position: relative;
+    }
+    .profile-button {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.8), rgba(22, 163, 74, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      padding: 0.5rem 1rem;
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .profile-button:hover {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 1));
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+    }
+    .profile-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.5rem 0;
+      min-width: 160px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .profile-menu a {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.2s ease;
+    }
+    .profile-menu a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .profile-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .voice-in-result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .btn-voice {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-voice:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(39, 126, 197, 0.4);
+    }
+    .voice-waveform {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      margin: 1rem 0;
+      min-height: 40px;
+    }
+    .wave-bar {
+      width: 5px;
+      height: 20px;
+      background: #f8b400;
+      border-radius: 999px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.12s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.24s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.36s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.48s; }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1.6); }
+    }
+    @media (max-width: 980px) {
+      .disease-info {
+        grid-template-columns: 1fr;
+      }
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .menu {
+        justify-content: center;
+      }
+    }
+    @media (max-width: 720px) {
+      .search-box,
+      .status-grid,
+      .hero-actions,
+      .voice-row {
+        flex-direction: column;
+      }
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+      .top-tools {
+        justify-content: space-between;
+      }
+    }
+    .stats-section {
+      margin-top: 2rem;
+      padding: 1.75rem;
+      background: rgba(15, 23, 42, 0.93);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 26px;
+      box-shadow: 0 28px 68px rgba(0, 0, 0, 0.25);
+    }
+    .stats-section h2 {
+      margin: 0 0 1.25rem;
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 1.1rem 1.3rem;
+      text-align: center;
+    }
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+    .stat-card .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .breakdown-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .breakdown-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .breakdown-list li strong {
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+      <div class="top-tools">
+        <select aria-label="Change language" class="lang-select">
+          <option>English</option>
+          <option>हिन्दी</option>
+          <option>मराठी</option>
+        </select>
+        <button class="toggle" id="themeToggle" type="button" title="Toggle theme">🌙</button>
+        <button class="logout-btn" onclick="window.location.href='index.html'" title="Logout">🚪 Logout</button>
+        <div class="profile">
+          <button class="profile-button" id="profileButton" title="User menu">👤 Farmer</button>
+          <div class="profile-menu" id="profileMenu">
+            <a href="#profile">My Profile</a>
+            <a href="#reports">My Reports</a>
+            <a href="#settings">Settings</a>
+            <a href="index.html">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero" id="home">
+      <article class="panel hero-panel">
+        <small>AgriTech — Smart Crop Detective</small>
+        <h1>Upload or capture a crop photo for instant analysis.</h1>
+        <p>Detect leaf health, disease signs, and crop condition directly on the homepage.</p>
+
+        <div class="hero-actions">
+          <input id="photoInput" type="file" accept="image/*" capture="environment" hidden onchange="handlePhotoInput(event)" />
+          <button class="btn-primary" type="button" onclick="triggerUpload()">📤 Upload Photo</button>
+          <button class="btn-secondary" type="button" onclick="triggerCapture()">📸 Capture Photo</button>
+        </div>
+
+        <div id="cameraScan" class="camera-scan hidden" aria-hidden="true">
+          <div class="scan-line" aria-hidden="true"></div>
+          <p class="scan-label">Scanning crop…</p>
+        </div>
+
+        <div id="voiceWaveform" class="voice-waveform" aria-hidden="true">
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+        </div>
+
+        <div id="cameraOverlay" class="camera-overlay hidden" aria-hidden="true">
+          <div class="camera-box">
+            <button class="close-camera" type="button" onclick="closeCameraOverlay()">✕ Close</button>
+            <video id="cameraFeed" autoplay playsinline muted></video>
+            <div class="camera-actions">
+              <button class="btn-primary" type="button" onclick="captureFromCamera()">📷 Capture Damage Photo</button>
+              <button class="btn-secondary" type="button" onclick="closeCameraOverlay()">🚫 Cancel</button>
+            </div>
+            <p class="camera-hint">Allow camera access, position the damaged crop leaves clearly, and tap capture.</p>
+          </div>
+        </div>
+
+        <div class="process-carousel">
+          <h3>📸 How Crop Detection Works</h3>
+          <div class="carousel-container">
+            <img class="carousel-image active" src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=400&q=80" alt="Step 1: Capture or Upload Photo" />
+            <img class="carousel-image" src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=400&q=80" alt="Step 2: AI Analyzes the Crop" />
+            <img class="carousel-image" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" alt="Step 3: Get Instant Results" />
+          </div>
+          <div class="carousel-indicators">
+            <span class="indicator active" data-slide="0"></span>
+            <span class="indicator" data-slide="1"></span>
+            <span class="indicator" data-slide="2"></span>
+          </div>
+        </div>
+
+        <div id="analysisResult" class="analysis-result hidden">
+          <h2>✅ Crop Analysis Result</h2>
+          <img id="resultPreview" class="result-preview" src="" alt="Uploaded crop preview" />
+          
+          <div class="disease-info">
+            <div class="info-card disease">
+              <h3>🔍 Disease Detected</h3>
+              <p id="diseaseText">Early leaf spot - Fungal infection on leaf surface</p>
+            </div>
+            
+            <div class="info-card soil">
+              <h3>🌍 Soil Requirements</h3>
+              <p id="soilText">pH: 6.0-6.8, Well-draining loam soil with good organic matter content</p>
+            </div>
+            
+            <div class="info-card fertilizer">
+              <h3>🌾 Recommended Fertilizers</h3>
+              <p id="fertilizerText">NPK 19:19:19, Apply 50kg/hectare. Micronutrients: Zinc (5kg/ha), Iron (3kg/ha)</p>
+            </div>
+            
+            <div class="info-card pesticide">
+              <h3>🛡️ Pesticide Treatment</h3>
+              <p id="pesticideText">Mancozeb 75% WP: 2kg/1000L water, Spray every 15 days during rainy season</p>
+            </div>
+
+            <div class="info-card moisture">
+              <h3>💧 Soil Moisture Level</h3>
+              <p id="moisturePercent">68%</p>
+              <div class="moisture-meter">
+                <div class="moisture-bar" id="moistureBar" style="width: 68%;"></div>
+              </div>
+              <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;" id="moistureStatus">Status: Optimal moisture level - Ideal for current crop stage</p>
+            </div>
+
+            <div class="info-card">
+              <h3>💡 Recommendations</h3>
+              <p id="recommendationText">Increase plant spacing to improve air circulation. Avoid overhead watering to reduce leaf wetness. Monitor plants daily for disease progression.</p>
+            </div>
+          </div>
+
+          <div class="voice-in-result">
+            <button type="button" onclick="speakResult()" ondblclick="stopSpeaking()" class="btn-voice">🔊 Read Result Aloud</button>
+          </div>
+        </div>
+
+        <div id="voicePanel" class="voice-panel hidden">
+          <h2>🔊 Hear Your Diagnosis</h2>
+          <p>If you cannot read the analysis details, tap the button below and the system will speak the findings in simple language.</p>
+          <div class="voice-row">
+            <button type="button" onclick="speakResult()">🔊 Read Result</button>
+          </div>
+        </div>
+      </article>
+
+      <aside class="hero-side">
+        <img class="hero-image" src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80" alt="Crop image" />
+      </aside>
+    </section>
+
+    <!-- ── Live Detection Statistics ──────────────────────────────── -->
+    <section class="stats-section" id="live-stats">
+      <h2>📊 Live Detection Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Total Detections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-top" style="font-size:1.1rem;padding-top:0.45rem;">—</div>
+          <div class="stat-label">Most Common Disease</div>
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin:0 0 0.75rem">Top 5 detected classes:</p>
+      <ul class="breakdown-list" id="stat-breakdown">
+        <li style="color:var(--muted);justify-content:center">Loading…</li>
+      </ul>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>AgriTech — Smart Crop Detective — intelligent farming for a more resilient tomorrow.</p>
+  </footer>
+
+  <script type="module">
+    import { renderNav } from './nav.js';
+    import { checkAuth } from './auth-guard.js';
+    checkAuth();
+    renderNav('dashboard');
+
+    // ── Fetch live detection stats ────────────────────────────────
+    async function loadStats() {
+      try {
+        const res  = await fetch('/api/stats');
+        const data = await res.json();
+
+        document.getElementById('stat-total').textContent = data.total_detections ?? '—';
+
+        // Format top disease from raw class name
+        const raw = data.top_disease || 'N/A';
+        const pretty = raw.includes('___')
+          ? raw.split('___')[1].replace(/_/g, ' ')
+          : raw.replace(/_/g, ' ');
+        document.getElementById('stat-top').textContent =
+          pretty.charAt(0).toUpperCase() + pretty.slice(1);
+
+        const ul = document.getElementById('stat-breakdown');
+        if (data.breakdown && data.breakdown.length) {
+          ul.innerHTML = data.breakdown.map(item => {
+            const name = item.disease_class.includes('___')
+              ? item.disease_class.split('___').map(p => p.replace(/_/g, ' ')).join(' — ')
+              : item.disease_class.replace(/_/g, ' ');
+            return `<li><span>${name}</span><strong>${item.count}</strong></li>`;
+          }).join('');
+        } else {
+          ul.innerHTML = '<li style="color:var(--muted);justify-content:center">No detections yet.</li>';
+        }
+      } catch (e) {
+        document.getElementById('stat-breakdown').innerHTML =
+          '<li style="color:var(--muted);justify-content:center">Stats unavailable.</li>';
+      }
+    }
+    loadStats();
+  </script>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const profileButton = document.getElementById('profileButton');
+    const profileMenu = document.getElementById('profileMenu');
+    const photoInput = document.getElementById('photoInput');
+    const analysisResult = document.getElementById('analysisResult');
+    const resultPreview = document.getElementById('resultPreview');
+
+    function syncThemeToggle() {
+      const isLightMode = document.body.classList.contains('light-mode');
+      themeToggle.textContent = isLightMode ? '☀️' : '🌙';
+      themeToggle.title = isLightMode ? 'Switch to dark mode' : 'Switch to light mode';
+    }
+
+    syncThemeToggle();
+
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      syncThemeToggle();
+    });
+
+    profileButton.addEventListener('click', () => {
+      profileMenu.classList.toggle('show');
+    });
+
+    window.addEventListener('click', (event) => {
+      if (!event.target.closest('.profile')) {
+        profileMenu.classList.remove('show');
+      }
+    });
+
+    let cameraStream = null;
+    let lastAnalysisText = '';
+
+    function triggerUpload() {
+      if (photoInput) {
+        photoInput.click();
+      }
+    }
+
+    function triggerCapture() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        openCameraOverlay();
+      } else if (photoInput) {
+        photoInput.click();
+      }
+    }
+
+    function openCameraOverlay() {
+      const overlay = document.getElementById('cameraOverlay');
+      const video = document.getElementById('cameraFeed');
+      if (!overlay || !video) return;
+      overlay.classList.remove('hidden');
+      overlay.setAttribute('aria-hidden', 'false');
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+        .then((stream) => {
+          cameraStream = stream;
+          video.srcObject = stream;
+          
+          // Dynamically mirror if front-facing or unknown (desktop webcams)
+          const track = stream.getVideoTracks()[0];
+          const settings = track.getSettings();
+          if (settings.facingMode === 'user' || !settings.facingMode) {
+            video.style.transform = 'scaleX(-1)';
+          } else {
+            video.style.transform = 'none';
+          }
+          
+          video.play();
+        })
+        .catch(() => {
+          overlay.classList.add('hidden');
+          overlay.setAttribute('aria-hidden', 'true');
+          if (photoInput) {
+            photoInput.click();
+          }
+        });
+    }
+
+    function closeCameraOverlay() {
+      const overlay = document.getElementById('cameraOverlay');
+      const video = document.getElementById('cameraFeed');
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-hidden', 'true');
+      if (video) {
+        video.pause();
+        video.srcObject = null;
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+      }
+    }
+
+    function captureFromCamera() {
+      const video = document.getElementById('cameraFeed');
+      if (!video) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 960;
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      
+      // Mirror canvas context if video is mirrored
+      if (video.style.transform === 'scaleX(-1)') {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+      }
+      
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageUrl = canvas.toDataURL('image/jpeg');
+      closeCameraOverlay();
+      processCapturedImage(imageUrl);
+    }
+
+    function processCapturedImage(imageUrl) {
+      if (resultPreview) {
+        resultPreview.src = imageUrl;
+      }
+      const analysis = getRandomAnalysis();
+      renderAnalysis(analysis);
+    }
+
+    function renderAnalysis(analysis) {
+      // Set the analysis text first
+      const moisturePercent = analysis.moisture;
+      const summary = `Detected disease: ${analysis.diseaseDetail}. Soil needs: ${analysis.soil}. Recommended fertilizer: ${analysis.fertilizer}. Suggested pesticide treatment: ${analysis.pesticide}. Moisture level is ${moisturePercent} percent. Recommendation: ${analysis.recommendation}`;
+      lastAnalysisText = summary;
+      
+      // Update UI elements
+      document.getElementById('diseaseText').textContent = analysis.diseaseDetail;
+      document.getElementById('soilText').textContent = analysis.soil;
+      document.getElementById('fertilizerText').textContent = analysis.fertilizer;
+      document.getElementById('pesticideText').textContent = analysis.pesticide;
+      document.getElementById('recommendationText').textContent = analysis.recommendation;
+      
+      document.getElementById('moisturePercent').textContent = moisturePercent + '%';
+      document.getElementById('moistureBar').style.width = moisturePercent + '%';
+      
+      let moistureStatus = '';
+      if (moisturePercent < 30) {
+        moistureStatus = 'Status: ⚠️ Very Dry - Immediate watering required';
+      } else if (moisturePercent < 50) {
+        moistureStatus = 'Status: 🔴 Low - Increase watering frequency';
+      } else if (moisturePercent < 70) {
+        moistureStatus = 'Status: 🟡 Moderate - Continue regular watering';
+      } else {
+        moistureStatus = 'Status: ✅ Optimal - Perfect moisture level for growth';
+      }
+      document.getElementById('moistureStatus').textContent = moistureStatus;
+      
+      // Show results
+      if (analysisResult) {
+        analysisResult.classList.remove('hidden');
+        const voicePanel = document.getElementById('voicePanel');
+        if (voicePanel) {
+          voicePanel.classList.remove('hidden');
+        }
+        analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function handlePhotoInput(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target.result;
+        if (resultPreview) {
+          resultPreview.src = imageUrl;
+        }
+        const analysis = getRandomAnalysis();
+        renderAnalysis(analysis);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function speakResult() {
+      const waveforms = document.querySelectorAll('#voiceWaveform, .voice-waveform');
+      if (!window.speechSynthesis) {
+        alert('Speech synthesis is not supported in this browser.');
+        return;
+      }
+      
+      // Check if analysis result is available
+      const analysisResult = document.getElementById('analysisResult');
+      if (!analysisResult || analysisResult.classList.contains('hidden')) {
+        const speakText = 'Please upload or capture a crop image first to get analysis results.';
+        const utterance = new SpeechSynthesisUtterance(speakText);
+        utterance.rate = 0.95;
+        utterance.pitch = 1.05;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+        return;
+      }
+      
+      const speakText = lastAnalysisText || 'Analysis result is being processed. Please wait a moment and try again.';
+      const utterance = new SpeechSynthesisUtterance(speakText);
+      utterance.rate = 0.95;
+      utterance.pitch = 1.05;
+      utterance.onstart = () => {
+        waveforms.forEach((el) => { el.style.display = 'flex'; });
+      };
+      utterance.onend = () => {
+        waveforms.forEach((el) => { el.style.display = 'none'; });
+      };
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
+
+    function stopSpeaking() {
+      if (window.speechSynthesis) {
+        speechSynthesis.cancel();
+        document.querySelectorAll('#voiceWaveform, .voice-waveform').forEach((el) => {
+          el.style.display = 'none';
+        });
+      }
+    }
+
+    // Sample crop analysis data - can be replaced with API call
+    const cropAnalysisData = [
+      {
+        disease: "Early Leaf Spot",
+        diseaseDetail: "Fungal infection causing brown spots with yellow halos on leaf surface",
+        soil: "pH: 6.0-6.8, Well-draining loam soil with 3-4% organic matter",
+        fertilizer: "NPK 19:19:19 at 50kg/hectare. Micronutrients: Zinc (5kg/ha), Iron (3kg/ha), Boron (2kg/ha)",
+        pesticide: "Mancozeb 75% WP: 2kg/1000L water. Spray every 15 days during monsoon",
+        moisture: 65,
+        recommendation: "Increase plant spacing to improve air circulation. Avoid overhead watering. Monitor daily for disease spread. Prune affected leaves."
+      },
+      {
+        disease: "Powdery Mildew",
+        diseaseDetail: "White powdery coating on leaf surface, reduces photosynthesis capacity",
+        soil: "pH: 6.0-7.0, Sandy loam with good drainage and aeration",
+        fertilizer: "NPK 12:32:16 at 40kg/hectare. Calcium (1000kg/ha), Magnesium (100kg/ha)",
+        pesticide: "Sulfur 80% WP: 3kg/1000L water. Spray at 10-day intervals starting early season",
+        moisture: 45,
+        recommendation: "Ensure proper ventilation. Reduce nitrogen fertilizer. Spray early morning. Remove infected plant parts."
+      },
+      {
+        disease: "Leaf Rust",
+        diseaseDetail: "Rust-colored pustules on leaf undersurface, severe defoliation if untreated",
+        soil: "pH: 5.5-7.0, Well-draining loamy soil with moderate fertility",
+        fertilizer: "NPK 15:15:20 at 60kg/hectare. Potassium is essential for disease resistance",
+        pesticide: "Propiconazole 25% EC: 1L/1000L water. Apply at first disease symptom",
+        moisture: 72,
+        recommendation: "Improve air circulation through pruning. Avoid wetting foliage. Apply fungicide preventively during humid seasons."
+      },
+      {
+        disease: "Healthy Leaf",
+        diseaseDetail: "No disease detected. Leaf shows excellent health with good color and texture",
+        soil: "pH: 6.2-6.8, Fertile loam soil with 4-5% organic matter",
+        fertilizer: "NPK 10:26:26 at 45kg/hectare for maintenance. Continue regular feeding schedule",
+        pesticide: "No treatment needed. Maintain preventive spray schedule as per seasonal calendar",
+        moisture: 70,
+        recommendation: "Maintain current watering schedule. Continue regular fertilizer application. Monitor for any early disease signs."
+      }
+    ];
+
+    function getRandomAnalysis() {
+      return cropAnalysisData[Math.floor(Math.random() * cropAnalysisData.length)];
+    }
+
+    function handlePhotoInput(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target.result;
+        if (resultPreview) {
+          resultPreview.src = imageUrl;
+        }
+        
+        // Get random analysis data
+        const analysis = getRandomAnalysis();
+        
+        // Update disease info
+        document.getElementById('diseaseText').textContent = analysis.diseaseDetail;
+        document.getElementById('soilText').textContent = analysis.soil;
+        document.getElementById('fertilizerText').textContent = analysis.fertilizer;
+        document.getElementById('pesticideText').textContent = analysis.pesticide;
+        document.getElementById('recommendationText').textContent = analysis.recommendation;
+        
+        // Update moisture level
+        const moisturePercent = analysis.moisture;
+        document.getElementById('moisturePercent').textContent = moisturePercent + '%';
+        document.getElementById('moistureBar').style.width = moisturePercent + '%';
+        
+        // Update moisture status
+        let moistureStatus = '';
+        if (moisturePercent < 30) {
+          moistureStatus = 'Status: ⚠️ Very Dry - Immediate watering required';
+        } else if (moisturePercent < 50) {
+          moistureStatus = 'Status: 🔴 Low - Increase watering frequency';
+        } else if (moisturePercent < 70) {
+          moistureStatus = 'Status: 🟡 Moderate - Continue regular watering';
+        } else {
+          moistureStatus = 'Status: ✅ Optimal - Perfect moisture level for growth';
+        }
+        document.getElementById('moistureStatus').textContent = moistureStatus;
+        
+        // Show results
+        if (analysisResult) {
+          analysisResult.classList.remove('hidden');
+          // Scroll to results
+          analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Carousel functionality
+    let currentSlide = 0;
+    const carouselImages = document.querySelectorAll('.carousel-image');
+    const indicators = document.querySelectorAll('.indicator');
+
+    function showSlide(index) {
+      carouselImages.forEach(img => img.classList.remove('active'));
+      indicators.forEach(ind => ind.classList.remove('active'));
+      
+      if (carouselImages[index]) {
+        carouselImages[index].classList.add('active');
+      }
+      if (indicators[index]) {
+        indicators[index].classList.add('active');
+      }
+      currentSlide = index;
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % carouselImages.length;
+      showSlide(currentSlide);
+    }
+
+    // Auto cycle every 3 seconds
+    if (carouselImages.length > 0) {
+      setInterval(nextSlide, 3000);
+    }
+
+    // Indicator click handlers
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => showSlide(index));
+    });
+  </script>
+</body>
+</html>

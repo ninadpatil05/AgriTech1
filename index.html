@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Login</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    :root {
+      --bg: #05060d;
+      --panel: rgba(15, 23, 42, 0.92);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --primary: #60a5fa;
+      --primary-strong: #38bdf8;
+      --accent: #452c72;
+      --success: #335c42;
+      --surface: #0f172a;
+      --border: rgba(148, 163, 184, 0.16);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #020409 0%, #07101a 45%, #0c1727 100%);
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 12% 20%, rgba(59, 130, 246, 0.12), transparent 18%),
+                  radial-gradient(circle at 85% 12%, rgba(250, 204, 21, 0.1), transparent 20%),
+                  radial-gradient(circle at 45% 75%, rgba(16, 185, 129, 0.08), transparent 18%);
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(14px);
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: "";
+      position: absolute;
+      top: -20%;
+      right: -15%;
+      width: 200px;
+      height: 200px;
+      background: rgba(96, 165, 250, 0.1);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .login-card::after {
+      content: "";
+      position: absolute;
+      bottom: -16%;
+      left: -12%;
+      width: 150px;
+      height: 150px;
+      background: rgba(34, 197, 94, 0.08);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .auth-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 0.25rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .auth-toggle button {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .auth-toggle button.active {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .auth-toggle::before {
+      content: "";
+      position: absolute;
+      top: 0.25rem;
+      left: 0.25rem;
+      width: calc(50% - 0.25rem);
+      height: calc(100% - 0.5rem);
+      background: rgba(96, 165, 250, 0.2);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      border-radius: 12px;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .auth-toggle.register-active::before {
+      transform: translateX(100%);
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .login-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #f8fafc;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .login-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #60a5fa, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.3s ease;
+    }
+
+    .register-header h1 {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: var(--muted);
+    }
+
+    .terms-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .terms-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 0.125rem;
+      accent-color: var(--success);
+    }
+
+    .terms-group label {
+      margin-bottom: 0;
+      line-height: 1.4;
+    }
+
+    .terms-group a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .terms-group a:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 25px rgba(96, 165, 250, 0.3);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(96, 165, 250, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, var(--success), #16a34a);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+    }
+
+    .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+    }
+
+    .signup-btn:active {
+      transform: translateY(0);
+    }
+
+    .signup-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .remember-me input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    .forgot-password {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-password:hover {
+      color: var(--primary-strong);
+      text-decoration: underline;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 2rem 0;
+      position: relative;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider span {
+      background: rgba(15, 23, 42, 0.95);
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .social-login {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .social-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .signup-link {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .signup-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .signup-link a:hover {
+      color: var(--primary-strong);
+      text-decoration: underline;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: #fca5a5;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .success-message {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: #86efac;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .voice-assistant {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+    }
+
+    .voice-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(96, 165, 250, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .voice-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(96, 165, 250, 0.6);
+    }
+
+    .voice-btn.listening {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      animation: pulse 2s infinite;
+    }
+
+    .voice-btn.processing {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+
+    .voice-status {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.5rem 1rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .voice-status.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .voice-feedback {
+      position: fixed;
+      bottom: 6rem;
+      right: 2rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1rem;
+      max-width: 300px;
+      color: var(--text);
+      font-size: 0.9rem;
+      backdrop-filter: blur(20px);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .voice-feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .voice-feedback .message {
+      margin-bottom: 0.5rem;
+    }
+
+    .voice-feedback .transcript {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    .voice-instructions {
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .voice-instructions h3 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .voice-instructions ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .voice-instructions li {
+      padding: 0.25rem 0;
+      color: var(--muted);
+    }
+
+    .voice-instructions li:before {
+      content: "🎤 ";
+      margin-right: 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .login-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .login-header h1 {
+        font-size: 1.75rem;
+      }
+
+      .social-login {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .login-card {
+        padding: 1.5rem 1rem;
+      }
+
+      .login-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="body-gradient">
+  <div class="container">
+    <nav class="navbar" style="margin-bottom: 1rem;">
+      <div id="nav-root"></div>
+    </nav>
+    <div class="login-card">
+      <div class="login-header">
+        <a href="dashboard.html" class="brand">
+          <span>🌱</span>
+          <span>AgriTech — Smart Crop Detective</span>
+        </a>
+      </div>
+
+      <div class="auth-toggle" id="authToggle">
+        <button class="auth-btn active" data-form="login">Sign In</button>
+        <button class="auth-btn" data-form="register">Register</button>
+      </div>
+
+      <div class="login-header">
+        <h1 id="formTitle">Welcome Back</h1>
+        <p id="formSubtitle">Sign in to access your AgriTech — Smart Crop Detective dashboard</p>
+      </div>
+
+      <div id="errorMessage" class="error-message">
+        Invalid email or password. Please try again.
+      </div>
+
+      <div id="successMessage" class="success-message">
+        Login successful! Redirecting...
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form active">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required />
+        </div>
+
+        <div class="login-options">
+          <label class="remember-me">
+            <input type="checkbox" id="remember" name="remember" />
+            Remember me
+          </label>
+          <a href="#" class="forgot-password">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="login-btn">Sign In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="auth-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regFirstName">First Name</label>
+            <input type="text" id="regFirstName" name="firstName" placeholder="John" required />
+          </div>
+          <div class="form-group">
+            <label for="regLastName">Last Name</label>
+            <input type="text" id="regLastName" name="lastName" placeholder="Doe" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" name="email" placeholder="john.doe@example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="regPhone">Phone Number (Optional)</label>
+          <input type="tel" id="regPhone" name="phone" placeholder="+1 (555) 123-4567" />
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" name="password" placeholder="Create a strong password" required minlength="8" />
+        </div>
+
+        <div class="form-group">
+          <label for="regConfirmPassword">Confirm Password</label>
+          <input type="password" id="regConfirmPassword" name="confirmPassword" placeholder="Confirm your password" required />
+        </div>
+
+        <div class="terms-group">
+          <input type="checkbox" id="regTerms" name="terms" required />
+          <label for="regTerms">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+
+        <button type="submit" class="signup-btn" id="signupBtn">Create Account</button>
+      </form>
+
+      <div class="divider">
+        <span>or continue with</span>
+      </div>
+
+      <div class="social-login">
+        <a href="#" class="social-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google
+        </a>
+        <a href="#" class="social-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Facebook
+        </a>
+      </div>
+
+      <div class="voice-instructions">
+        <h3>Voice Commands Available</h3>
+        <ul>
+          <li>"Sign in" or "Login"</li>
+          <li>"Register" or "Sign up"</li>
+          <li>"Email" followed by your email</li>
+          <li>"Password" followed by your password</li>
+          <li>"Submit" or "Enter"</li>
+          <li>"Clear" or "Reset"</li>
+        </ul>
+      </div>
+
+      <div class="signup-link" id="authLink">
+        Don't have an account? <a href="#" id="signupLink">Sign up</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="voice-assistant">
+    <div class="voice-status" id="voiceStatus">Ready</div>
+    <button class="voice-btn" id="voiceBtn" aria-label="Voice Assistant">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="voice-feedback" id="voiceFeedback">
+    <div class="message" id="voiceMessage"></div>
+    <div class="transcript" id="voiceTranscript"></div>
+  </div>
+
+  <script type="module">
+    import { renderNav } from './nav.js';
+    import { login as apiLogin, register as apiRegister } from './api.js';
+    import { getRedirectParam, storeAuthToken } from './auth-guard.js';
+
+    renderNav('index');
+
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const authToggle = document.getElementById('authToggle');
+    const authButtons = document.querySelectorAll('.auth-btn');
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const authLink = document.getElementById('authLink');
+
+    function switchAuthForm(formType) {
+      const targetButton = document.querySelector(`[data-form="${formType}"]`);
+      if (!targetButton) return;
+
+      authButtons.forEach(btn => btn.classList.remove('active'));
+      targetButton.classList.add('active');
+      authToggle.classList.toggle('register-active', formType === 'register');
+
+      document.querySelectorAll('.auth-form').forEach(form => {
+        form.classList.remove('active');
+      });
+      document.getElementById(`${formType}Form`).classList.add('active');
+
+      if (formType === 'login') {
+        formTitle.textContent = 'Welcome Back';
+        formTitle.style.background = 'linear-gradient(135deg, #60a5fa, #38bdf8)';
+        formTitle.style.webkitBackgroundClip = 'text';
+        formTitle.style.webkitTextFillColor = 'transparent';
+        formTitle.style.backgroundClip = 'text';
+        formSubtitle.textContent = 'Sign in to access your AgriTech — Smart Crop Detective dashboard';
+        authLink.innerHTML = 'Don\'t have an account? <a href="#" id="signupLink">Sign up</a>';
+      } else {
+        formTitle.textContent = 'Join AgriTech — Smart Crop Detective';
+        formTitle.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+        formTitle.style.webkitBackgroundClip = 'text';
+        formTitle.style.webkitTextFillColor = 'transparent';
+        formTitle.style.backgroundClip = 'text';
+        formSubtitle.textContent = 'Create your account to start detecting crop diseases';
+        authLink.innerHTML = 'Already have an account? <a href="#" id="loginLink">Sign in</a>';
+      }
+
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+    }
+
+    // Handle auth toggle
+    authButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        switchAuthForm(button.dataset.form);
+      });
+    });
+
+    const requestedTab = new URLSearchParams(window.location.search).get('tab');
+    if (requestedTab === 'register') {
+      switchAuthForm('register');
+    }
+
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+
+      if (!email || !password) {
+        errorMessage.textContent = 'Please enter your email and password.';
+        errorMessage.style.display = 'block';
+        return;
+      }
+
+      try {
+        const { res, data } = await apiLogin(email, password);
+
+        if (!res.ok) {
+          errorMessage.textContent = data.error || 'Invalid email or password. Please try again.';
+          errorMessage.style.display = 'block';
+          return;
+        }
+
+        storeAuthToken(data.token);
+        successMessage.textContent = 'Login successful! Redirecting...';
+        successMessage.style.display = 'block';
+        setTimeout(() => {
+          window.location.href = getRedirectParam() || 'dashboard.html';
+        }, 800);
+      } catch (err) {
+        console.error(err);
+        errorMessage.textContent = 'Could not reach the server. Is the Flask app running?';
+        errorMessage.style.display = 'block';
+      }
+    });
+
+    registerForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById('regFirstName').value.trim();
+      const lastName = document.getElementById('regLastName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
+      const termsAccepted = document.getElementById('regTerms').checked;
+
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+
+      let errorText = '';
+
+      if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        errorText = 'Please fill in all required fields.';
+      } else if (password.length < 8) {
+        errorText = 'Password must be at least 8 characters long.';
+      } else if (password !== confirmPassword) {
+        errorText = 'Passwords do not match.';
+      } else if (!termsAccepted) {
+        errorText = 'Please accept the Terms of Service and Privacy Policy.';
+      }
+
+      if (errorText) {
+        errorMessage.textContent = errorText;
+        errorMessage.style.display = 'block';
+        return;
+      }
+
+      const signupBtn = document.getElementById('signupBtn');
+      signupBtn.disabled = true;
+      signupBtn.textContent = 'Creating Account...';
+
+      try {
+        const { res, data } = await apiRegister({
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone || null
+        });
+
+        if (res.status === 409) {
+          errorMessage.textContent = data.error || 'An account with this email already exists.';
+          errorMessage.style.display = 'block';
+          signupBtn.disabled = false;
+          signupBtn.textContent = 'Create Account';
+          return;
+        }
+
+        if (!res.ok) {
+          errorMessage.textContent = data.error || 'Registration failed. Please try again.';
+          errorMessage.style.display = 'block';
+          signupBtn.disabled = false;
+          signupBtn.textContent = 'Create Account';
+          return;
+        }
+
+        successMessage.textContent = 'Account created! You can sign in now.';
+        successMessage.style.display = 'block';
+        document.querySelector('[data-form="login"]').click();
+        registerForm.reset();
+      } catch (err) {
+        console.error(err);
+        errorMessage.textContent = 'Could not reach the server. Is the Flask app running?';
+        errorMessage.style.display = 'block';
+      } finally {
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
+      }
+    });
+
+    // Handle auth link clicks
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'signupLink') {
+        e.preventDefault();
+        switchAuthForm('register');
+      } else if (e.target.id === 'loginLink') {
+        e.preventDefault();
+        switchAuthForm('login');
+      }
+    });
+
+    // Add some interactive effects
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+      });
+
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Voice Assistant Implementation
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceFeedback = document.getElementById('voiceFeedback');
+    const voiceMessage = document.getElementById('voiceMessage');
+    const voiceTranscript = document.getElementById('voiceTranscript');
+
+    // Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechSynthesis = window.speechSynthesis;
+    const canSpeak = !!SpeechSynthesis;
+
+    if (!SpeechRecognition) {
+      voiceBtn.style.display = 'none';
+      console.warn('Speech recognition is not supported in this browser');
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      let isListening = false;
+      let currentField = null;
+      let isWaitingForValue = false;
+
+      // Voice assistant functions
+      function showVoiceStatus(status, show = true) {
+        voiceStatus.textContent = status;
+        if (show) {
+          voiceStatus.classList.add('show');
+          setTimeout(() => {
+            voiceStatus.classList.remove('show');
+          }, 3000);
+        }
+      }
+
+      function showVoiceFeedback(message, transcript = '') {
+        voiceMessage.textContent = message;
+        voiceTranscript.textContent = transcript ? `"${transcript}"` : '';
+        voiceFeedback.classList.add('show');
+        setTimeout(() => {
+          voiceFeedback.classList.remove('show');
+        }, 4000);
+      }
+
+      function speak(text) {
+        if (!canSpeak) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        SpeechSynthesis.speak(utterance);
+      }
+
+      function processCommand(command) {
+        const lowerCommand = command.toLowerCase().trim();
+        
+        // Navigation commands
+        if (lowerCommand.includes('sign in') || lowerCommand.includes('login')) {
+          document.querySelector('[data-form="login"]').click();
+          speak('Switched to sign in form');
+          showVoiceFeedback('Switched to sign in form', command);
+          return;
+        }
+
+        if (lowerCommand.includes('register') || lowerCommand.includes('sign up')) {
+          document.querySelector('[data-form="register"]').click();
+          speak('Switched to registration form');
+          showVoiceFeedback('Switched to registration form', command);
+          return;
+        }
+
+        // Form field commands
+        if (lowerCommand.includes('email')) {
+          const activeForm = document.querySelector('.auth-form.active');
+          const emailField = activeForm.querySelector('input[type="email"]');
+          if (emailField) {
+            currentField = emailField;
+            isWaitingForValue = true;
+            emailField.focus();
+            speak('Please say your email address');
+            showVoiceFeedback('Ready for email input', command);
+          }
+          return;
+        }
+
+        if (lowerCommand.includes('password')) {
+          const activeForm = document.querySelector('.auth-form.active');
+          const passwordField = activeForm.querySelector('input[type="password"]');
+          if (passwordField) {
+            currentField = passwordField;
+            isWaitingForValue = true;
+            passwordField.focus();
+            speak('Please say your password');
+            showVoiceFeedback('Ready for password input', command);
+          }
+          return;
+        }
+
+        if (lowerCommand.includes('first name')) {
+          const firstNameField = document.getElementById('regFirstName');
+          if (firstNameField) {
+            currentField = firstNameField;
+            isWaitingForValue = true;
+            firstNameField.focus();
+            speak('Please say your first name');
+            showVoiceFeedback('Ready for first name input', command);
+          }
+          return;
+        }
+
+        if (lowerCommand.includes('last name')) {
+          const lastNameField = document.getElementById('regLastName');
+          if (lastNameField) {
+            currentField = lastNameField;
+            isWaitingForValue = true;
+            lastNameField.focus();
+            speak('Please say your last name');
+            showVoiceFeedback('Ready for last name input', command);
+          }
+          return;
+        }
+
+        if (lowerCommand.includes('phone')) {
+          const phoneField = document.getElementById('regPhone');
+          if (phoneField) {
+            currentField = phoneField;
+            isWaitingForValue = true;
+            phoneField.focus();
+            speak('Please say your phone number');
+            showVoiceFeedback('Ready for phone number input', command);
+          }
+          return;
+        }
+
+        // Action commands
+        if (lowerCommand.includes('submit') || lowerCommand.includes('enter') || lowerCommand.includes('sign in') || lowerCommand.includes('register')) {
+          const activeForm = document.querySelector('.auth-form.active');
+          const submitBtn = activeForm.querySelector('button[type="submit"]');
+          if (submitBtn && !submitBtn.disabled) {
+            submitBtn.click();
+            speak('Form submitted');
+            showVoiceFeedback('Form submitted successfully', command);
+          } else {
+            speak('Please fill in all required fields first');
+            showVoiceFeedback('Please fill in all required fields first', command);
+          }
+          return;
+        }
+
+        if (lowerCommand.includes('clear') || lowerCommand.includes('reset')) {
+          const activeForm = document.querySelector('.auth-form.active');
+          activeForm.reset();
+          speak('Form cleared');
+          showVoiceFeedback('Form has been cleared', command);
+          return;
+        }
+
+        // Value input for current field
+        if (isWaitingForValue && currentField) {
+          // Clean up the input for common speech recognition issues
+          let cleanedValue = command
+            .replace(/\bat\b/g, '@')  // Replace "at" with "@"
+            .replace(/\bdot\b/g, '.')  // Replace "dot" with "."
+            .replace(/\s+/g, ' ')      // Normalize spaces
+            .trim();
+
+          // Handle email formatting
+          if (currentField.type === 'email') {
+            cleanedValue = cleanedValue.replace(/\s+at\s+/g, '@').replace(/\s+dot\s+/g, '.');
+          }
+
+          currentField.value = cleanedValue;
+          isWaitingForValue = false;
+          currentField = null;
+          speak(`Value entered: ${cleanedValue}`);
+          showVoiceFeedback(`Entered: ${cleanedValue}`, command);
+          return;
+        }
+
+        // Help command
+        if (lowerCommand.includes('help') || lowerCommand.includes('commands')) {
+          const helpText = 'Available voice commands: sign in, register, email, password, first name, last name, phone, submit, clear, and help. You can also say "email" followed by your email address to fill it directly.';
+          speak(helpText);
+          showVoiceFeedback('Voice help activated', command);
+          return;
+        }
+
+        // Unknown command
+        speak('Command not recognized. Say "help" for available commands');
+        showVoiceFeedback('Command not recognized', command);
+      }
+
+      // Recognition event handlers
+      recognition.onstart = () => {
+        isListening = true;
+        voiceBtn.classList.add('listening');
+        showVoiceStatus('Listening...');
+      };
+
+      recognition.onresult = (event) => {
+        const current = event.resultIndex;
+        const transcript = event.results[current][0].transcript;
+        
+        if (event.results[current].isFinal) {
+          voiceBtn.classList.remove('listening');
+          voiceBtn.classList.add('processing');
+          showVoiceStatus('Processing...');
+          
+          setTimeout(() => {
+            processCommand(transcript);
+            voiceBtn.classList.remove('processing');
+            isListening = false;
+          }, 500);
+        } else {
+          // Show interim results
+          voiceTranscript.textContent = `"${transcript}"`;
+          voiceFeedback.classList.add('show');
+        }
+      };
+
+      recognition.onerror = (event) => {
+        isListening = false;
+        voiceBtn.classList.remove('listening', 'processing');
+        const isInsecureContext = !(window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+        const errorHelp = {
+          'not-allowed': 'Microphone access is blocked. Allow mic permission in browser site settings and try again.',
+          'service-not-allowed': 'Speech service is blocked by browser policy. Check browser permissions/settings.',
+          'audio-capture': 'No microphone detected. Connect/select a microphone and retry.',
+          'network': 'Speech service network error. Check internet connection and retry.',
+          'no-speech': 'No speech was detected. Speak clearly after tapping the mic button.',
+          'aborted': 'Voice capture was interrupted. Tap mic again to retry.',
+          'language-not-supported': 'Selected language is not supported by this browser speech engine.',
+        };
+        const message = isInsecureContext
+          ? 'Voice recognition needs a secure context (HTTPS or localhost).'
+          : (errorHelp[event.error] || 'Voice recognition failed. Please try again.');
+
+        showVoiceStatus('Voice error');
+        showVoiceFeedback(message, '');
+        console.error('Speech recognition error:', event.error);
+        speak(message);
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        voiceBtn.classList.remove('listening', 'processing');
+        if (!voiceBtn.classList.contains('processing')) {
+          showVoiceStatus('Ready');
+        }
+      };
+
+      // Voice button click handler
+      voiceBtn.addEventListener('click', () => {
+        if (!isListening) {
+          try {
+            if (SpeechSynthesis && SpeechSynthesis.speaking) {
+              SpeechSynthesis.cancel();
+            }
+            recognition.start();
+          } catch (error) {
+            console.error('Failed to start recognition:', error);
+            showVoiceFeedback('Failed to start voice recognition', '');
+          }
+        } else {
+          recognition.stop();
+        }
+      });
+
+      // Initialize voice assistant
+      showVoiceStatus('Ready');
+      
+      // Welcome message when page loads
+      if (canSpeak) {
+        setTimeout(() => {
+          speak('Welcome to AgriTech — Smart Crop Detective. Click the microphone button or say help to use voice commands.');
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

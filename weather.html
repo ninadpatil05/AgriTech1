@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Weather</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    :root {
+      --accent: #f8b400;
+      --danger: #ef4444;
+      --shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 15% 20%, rgba(96, 165, 250, 0.12), transparent 18%),
+                  radial-gradient(circle at 80% 10%, rgba(248, 180, 0, 0.1), transparent 20%),
+                  radial-gradient(circle at 50% 80%, rgba(34, 197, 94, 0.08), transparent 18%);
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(20px);
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.5rem 0;
+    }
+
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      background: linear-gradient(135deg, #111827, #1f2937);
+      border-radius: 999px;
+      padding: 0.9rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: rgba(242, 242, 247, 0.9);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background: rgba(248, 180, 0, 0.95);
+      color: #0f172a;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(248, 180, 0, 0.24);
+    }
+
+    .hero {
+      margin-top: 1.75rem;
+      padding: 2rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-headline h1 {
+      font-size: clamp(2rem, 3vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      margin-top: 1rem;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .weather-panel {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.5rem;
+    }
+
+    .weather-card,
+    .recommendation-card,
+    .forecast-card,
+    .alert-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.8rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+    }
+
+    .weather-card h2,
+    .recommendation-card h2,
+    .forecast-card h2,
+    .alert-card h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+    }
+
+    .location-form {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .location-form input,
+    .location-form button {
+      width: 100%;
+      border-radius: 18px;
+      font-size: 1rem;
+      padding: 1rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+    }
+
+    .location-form button {
+      background: linear-gradient(135deg, #60a5fa, #22c55e);
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .location-form button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(34, 197, 94, 0.2);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .status-item {
+      padding: 1rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .status-item strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #f8fafc;
+    }
+
+    .status-item span {
+      display: block;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .alert-card {
+      grid-column: 1 / -1;
+    }
+
+    .alert-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 18px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .forecast-day {
+      padding: 1rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .forecast-day strong {
+      display: block;
+      margin: 0.8rem 0 0.4rem;
+      color: #f8fafc;
+    }
+
+    .forecast-day span {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .recommendation-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .recommendation-card li {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1rem;
+      color: var(--muted);
+    }
+
+    .recommendation-card li strong {
+      color: #f8fafc;
+      display: block;
+      font-size: 0.98rem;
+    }
+
+    .recommendation-card li span {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .weather-summary {
+      margin-top: 1.5rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .weather-summary strong {
+      color: #f8fafc;
+    }
+
+    .notice {
+      margin-top: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 18px;
+      background: rgba(96, 165, 250, 0.08);
+      border: 1px solid rgba(96, 165, 250, 0.16);
+      color: #c7d2fe;
+    }
+
+    .small-note {
+      display: block;
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 980px) {
+      .weather-panel {
+        grid-template-columns: 1fr;
+      }
+      .forecast-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .forecast-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-headline">
+        <div>
+          <h1>Smart Weather for Farming</h1>
+          <p>Get real-time weather, 7-day forecasts, rain warnings, and crop guidance tailored to your field.</p>
+        </div>
+        <div class="location-form">
+          <input id="cityInput" type="text" placeholder="Enter city or village name" aria-label="City name" />
+          <button id="searchBtn" type="button">Search by City</button>
+          <button id="geoBtn" type="button">Use My Location</button>
+          <span class="small-note">Forecast powered by Open-Meteo (free). Live current conditions also fetched from OpenWeatherMap via server proxy.</span>
+        </div>
+      </div>
+
+      <div class="weather-panel">
+        <div class="weather-card">
+          <h2>Live Weather Snapshot</h2>
+          <div class="status-grid">
+            <div class="status-item">
+              <span>🌡️</span>
+              <strong id="tempValue">--</strong>
+              <p>Air Temperature</p>
+            </div>
+            <div class="status-item">
+              <span>💧</span>
+              <strong id="humidityValue">--</strong>
+              <p>Humidity</p>
+            </div>
+            <div class="status-item">
+              <span>💨</span>
+              <strong id="windValue">--</strong>
+              <p>Wind Speed</p>
+            </div>
+            <div class="status-item">
+              <span>☔</span>
+              <strong id="rainValue">--</strong>
+              <p>Chance of rain</p>
+            </div>
+          </div>
+
+          <div class="weather-summary" id="weatherSummary">
+            <p><strong>Current:</strong> --</p>
+            <p><strong>Feels like:</strong> --</p>
+            <p><strong>Air pressure:</strong> --</p>
+            <p><strong>UV index:</strong> --</p>
+            <p><strong>Sunrise / Sunset:</strong> --</p>
+          </div>
+        </div>
+
+        <!-- AI-powered actionable advice panel -->
+        <div class="recommendation-card" id="aiAdviceCard">
+          <h2>🤖 AI Farming Advice</h2>
+          <div id="aiAdviceSummary" style="margin:0.75rem 0 1rem;color:#94a3b8;font-size:0.95rem;line-height:1.6;">
+            Search a location to get AI-powered farming advice for today.
+          </div>
+          <div id="aiAdviceActions" style="display:none;">
+            <div style="margin-bottom:1rem;">
+              <strong style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;color:#60a5fa;">Do today</strong>
+              <ul id="aiDoToday" style="list-style:none;padding:0;margin:0.5rem 0 0;display:grid;gap:0.5rem;"></ul>
+            </div>
+            <div style="margin-bottom:1rem;">
+              <strong style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;color:#ef4444;">Avoid today</strong>
+              <ul id="aiAvoidToday" style="list-style:none;padding:0;margin:0.5rem 0 0;display:grid;gap:0.5rem;"></ul>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div id="aiSprayBadge" style="padding:0.75rem;border-radius:12px;text-align:center;"></div>
+              <div id="aiFieldBadge" style="padding:0.75rem;border-radius:12px;text-align:center;"></div>
+            </div>
+          </div>
+          <div id="aiAdviceLoading" class="hidden" style="text-align:center;padding:1rem;color:#94a3b8;">
+            ⏳ Getting AI advice...
+          </div>
+        </div>
+
+        <div class="forecast-card">
+          <h2>7-Day Forecast</h2>
+          <div class="forecast-grid" id="forecastGrid">
+            <div class="forecast-day">Loading forecast...</div>
+          </div>
+        </div>
+
+        <!-- Extreme Weather Alert Banner (backend rule engine) -->
+        <div class="alert-card hidden" id="alertCard" style="grid-column:1/-1;">
+          <h2>⚠️ Weather Alerts</h2>
+          <div id="alertContent"></div>
+        </div>
+
+        <!-- Irrigation Decision Panel -->
+        <div class="recommendation-card" id="irrigationCard" style="grid-column:1/-1;display:none;">
+          <h2>💧 Irrigation Decision</h2>
+          <div id="irrigationContent" style="display:grid;gap:1rem;">
+            <div id="irrigationDecisionBadge" style="padding:1.2rem;border-radius:16px;text-align:center;"></div>
+            <div id="irrigationDetails" style="color:#94a3b8;line-height:1.7;"></div>
+          </div>
+        </div>
+
+        <!-- Smart Crop Planning Panel -->
+        <div class="recommendation-card" id="cropPlanCard" style="grid-column:1/-1;display:none;">
+          <h2>🌱 Smart Crop Planning</h2>
+          <div id="cropPlanContent"></div>
+        </div>
+
+      </div>
+
+      <!-- Crop input strip (shown after weather loads) -->
+      <div id="cropInputStrip" class="hidden" style="margin-top:1.5rem;padding:1.5rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;">
+        <h3 style="margin:0 0 1rem;font-size:1rem;">Get Personalised AI Recommendations</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;">
+          <div style="flex:1;min-width:160px;">
+            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:0.35rem;">Your crop</label>
+            <input id="cropInputField" type="text" placeholder="e.g. Tomato, Wheat, Rice" style="width:100%;border-radius:12px;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:#f8fafc;font-size:1rem;" />
+          </div>
+          <div style="flex:1;min-width:160px;">
+            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:0.35rem;">Soil type</label>
+            <select id="soilTypeSelect" style="width:100%;border-radius:12px;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.15);background:rgba(15,23,42,0.9);color:#f8fafc;font-size:1rem;">
+              <option value="loam">Loam</option>
+              <option value="clay">Clay</option>
+              <option value="sandy">Sandy</option>
+              <option value="black cotton">Black cotton (vertisol)</option>
+              <option value="red laterite">Red / laterite</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:160px;">
+            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:0.35rem;">Crop stage</label>
+            <select id="cropStageSelect" style="width:100%;border-radius:12px;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.15);background:rgba(15,23,42,0.9);color:#f8fafc;font-size:1rem;">
+              <option value="seedling">Seedling</option>
+              <option value="vegetative" selected>Vegetative</option>
+              <option value="flowering">Flowering</option>
+              <option value="fruiting">Fruiting / pod fill</option>
+              <option value="maturity">Maturity / harvest</option>
+            </select>
+          </div>
+          <button id="getAiBtn" type="button" style="border:none;border-radius:12px;padding:0.85rem 1.4rem;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap;font-size:0.95rem;">
+            🤖 Get AI Advice
+          </button>
+          <button id="getCropPlanBtn" type="button" style="border:none;border-radius:12px;padding:0.85rem 1.4rem;background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap;font-size:0.95rem;">
+            🌱 Crop Planning
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">AgriTech — Smart Crop Detective — weather-driven decisions for better harvests.</footer>
+  </div>
+
+  <script type="module">
+    import { renderNav } from './nav.js';
+    import { checkAuth } from './auth-guard.js';
+    import { geocodeCity, fetchOpenMeteoForecast } from './api.js';
+
+    checkAuth();
+    renderNav('weather');
+
+    // ── DOM refs ──────────────────────────────────────────────────────────────
+    const searchBtn   = document.getElementById('searchBtn');
+    const geoBtn      = document.getElementById('geoBtn');
+    const cityInput   = document.getElementById('cityInput');
+    const tempValue   = document.getElementById('tempValue');
+    const humidityValue = document.getElementById('humidityValue');
+    const windValue   = document.getElementById('windValue');
+    const rainValue   = document.getElementById('rainValue');
+    const weatherSummary  = document.getElementById('weatherSummary');
+    const forecastGrid    = document.getElementById('forecastGrid');
+    const alertCard       = document.getElementById('alertCard');
+    const alertContent    = document.getElementById('alertContent');
+    const cropInputStrip  = document.getElementById('cropInputStrip');
+    const getAiBtn        = document.getElementById('getAiBtn');
+    const getCropPlanBtn  = document.getElementById('getCropPlanBtn');
+
+    // Stores last known lat/lon for AI calls after weather loads
+    let _lastLat = null, _lastLon = null, _lastCity = '';
+
+    // ── WMO helpers ───────────────────────────────────────────────────────────
+    function wmoDescription(code) {
+      const m = {
+        0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+        45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Dense drizzle',
+        61:'Slight rain',63:'Rain',65:'Heavy rain',71:'Slight snow',73:'Snow',75:'Heavy snow',
+        80:'Rain showers',81:'Moderate showers',82:'Violent showers',95:'Thunderstorm',
+        96:'Thunderstorm with hail',99:'Severe thunderstorm'
+      };
+      return m[code] != null ? m[code] : 'Mixed conditions';
+    }
+    function wmoEmoji(code) {
+      if (code === 0 || code === 1) return '☀️';
+      if (code === 2 || code === 3) return '☁️';
+      if (code >= 45 && code <= 48) return '🌫️';
+      if (code >= 51 && code <= 67) return '🌧️';
+      if (code >= 71 && code <= 77) return '❄️';
+      if (code >= 80 && code <= 82) return '🌦️';
+      if (code >= 95) return '⛈️';
+      return '🌤️';
+    }
+
+    // ── Location fetch flow ───────────────────────────────────────────────────
+    async function fetchWeatherByCity(city) {
+      try {
+        const r = await geocodeCity(city);
+        if (!r) throw new Error('City not found');
+        const label = [r.name, r.admin1, r.country_code].filter(Boolean).join(', ');
+        fetchForecast(r.latitude, r.longitude, label);
+      } catch (error) { showError(error.message || 'Unable to fetch city data'); }
+    }
+
+    async function fetchWeatherByLocation() {
+      if (!navigator.geolocation) { showError('Geolocation not supported.'); return; }
+      navigator.geolocation.getCurrentPosition(
+        pos => fetchForecast(pos.coords.latitude, pos.coords.longitude, ''),
+        ()  => showError('Location permission denied. Please enter your city manually.')
+      );
+    }
+
+    async function fetchForecast(lat, lon, locationName) {
+      try {
+        const { ok, data } = await fetchOpenMeteoForecast(lat, lon);
+        if (!ok || !data) throw new Error('Unable to fetch weather forecast');
+        const name = locationName || `Lat ${Number(lat).toFixed(2)}, Lon ${Number(lon).toFixed(2)}`;
+        _lastLat = lat; _lastLon = lon; _lastCity = locationName;
+        renderWeather(data, name);
+        // OWM proxy for live enrichment (best-effort)
+        fetchFromProxy({ lat, lon }, name);
+        // Fetch extreme weather alerts from backend (rule-based, instant)
+        fetchBackendAlerts(lat, lon);
+        // Reveal the AI personalisation strip
+        cropInputStrip.classList.remove('hidden');
+      } catch (error) { showError(error.message || 'Unable to load weather data'); }
+    }
+
+    async function fetchFromProxy(coords, locationName) {
+      try {
+        const qs = coords.lat && coords.lon
+          ? `lat=${encodeURIComponent(coords.lat)}&lon=${encodeURIComponent(coords.lon)}`
+          : `city=${encodeURIComponent(coords.city || locationName)}`;
+        const res = await fetch(`/api/weather?${qs}`);
+        if (!res.ok) { if (res.status !== 503) console.warn('OWM proxy:', res.status); return; }
+        const d = await res.json();
+        if (d.main) {
+          humidityValue.textContent = `${d.main.humidity}%`;
+          if (d.main.feels_like != null) {
+            const feelsEl = weatherSummary.querySelector('p:nth-child(3)');
+            if (feelsEl) feelsEl.innerHTML = `<strong>Feels like:</strong> ${Math.round(d.main.feels_like)}°C <small style="color:var(--muted)">(live)</small>`;
+          }
+        }
+        if (d.wind) windValue.textContent = `${d.wind.speed != null ? d.wind.speed.toFixed(1) : '—'} m/s`;
+      } catch (_) { /* silently ignore */ }
+    }
+
+    // ── Render weather grid ───────────────────────────────────────────────────
+    function renderWeather(data, locationName) {
+      const cur = data.current;
+      const daily = data.daily;
+      if (!cur || !daily || !daily.time || !daily.time.length) { showError('Incomplete weather response'); return; }
+
+      const code = cur.weather_code;
+      const rainChance = daily.precipitation_probability_max && daily.precipitation_probability_max[0] != null
+        ? daily.precipitation_probability_max[0]
+        : (daily.precipitation_sum && daily.precipitation_sum[0] > 0 ? 70 : 15);
+
+      tempValue.textContent     = `${Math.round(cur.temperature_2m)}°C`;
+      humidityValue.textContent = `${cur.relative_humidity_2m}%`;
+      windValue.textContent     = `${cur.wind_speed_10m != null ? cur.wind_speed_10m.toFixed(1) : '—'} m/s`;
+      rainValue.textContent     = `${Math.round(rainChance)}%`;
+
+      const sunrise  = daily.sunrise  && daily.sunrise[0]  ? formatIsoTime(daily.sunrise[0])  : '—';
+      const sunset   = daily.sunset   && daily.sunset[0]   ? formatIsoTime(daily.sunset[0])   : '—';
+      const uv       = cur.uv_index       != null ? cur.uv_index       : '—';
+      const pressure = cur.surface_pressure != null ? `${Math.round(cur.surface_pressure)} hPa` : '—';
+      const feels    = cur.apparent_temperature != null ? `${Math.round(cur.apparent_temperature)}°C` : '—';
+
+      weatherSummary.innerHTML = `
+        <p><strong>Location:</strong> ${escapeHtml(locationName)}</p>
+        <p><strong>Conditions:</strong> ${capitalize(wmoDescription(code))}</p>
+        <p><strong>Feels like:</strong> ${feels}</p>
+        <p><strong>Pressure:</strong> ${pressure}</p>
+        <p><strong>UV index:</strong> ${uv}</p>
+        <p><strong>Sunrise / Sunset:</strong> ${sunrise} / ${sunset}</p>
+      `;
+      renderForecast(daily);
+    }
+
+    function renderForecast(daily) {
+      const n = Math.min(7, daily.time.length);
+      forecastGrid.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const code    = daily.weathercode[i];
+        const hi      = daily.temperature_2m_max[i];
+        const lo      = daily.temperature_2m_min[i];
+        const pop     = daily.precipitation_probability_max && daily.precipitation_probability_max[i] != null ? daily.precipitation_probability_max[i] : 0;
+        const precip  = daily.precipitation_sum && daily.precipitation_sum[i] != null ? daily.precipitation_sum[i] : 0;
+        const el      = document.createElement('div');
+        el.className  = 'forecast-day';
+        el.innerHTML  = `
+          <span>${formatWeekdayIso(daily.time[i])}</span>
+          <div style="font-size:2.5rem;line-height:1;" aria-hidden="true">${wmoEmoji(code)}</div>
+          <strong>${Math.round(hi)}° / ${Math.round(lo)}°C</strong>
+          <span>${capitalize(wmoDescription(code))}</span>
+          <span>Rain: ${Math.round(pop)}%</span>
+          <span>${precip.toFixed(1)} mm</span>
+        `;
+        forecastGrid.appendChild(el);
+      }
+    }
+
+    // ── FEATURE 4: Extreme weather alerts (backend rule engine) ──────────────
+    async function fetchBackendAlerts(lat, lon) {
+      try {
+        const res = await fetch(`/api/weather-alerts?lat=${lat}&lon=${lon}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status !== 'success' || !data.alerts || data.alerts.length === 0) {
+          alertCard.classList.add('hidden');
+          return;
+        }
+        renderBackendAlerts(data.alerts, data.location);
+      } catch (_) { /* silent — alerts are non-critical */ }
+    }
+
+    function renderBackendAlerts(alerts, location) {
+      if (!alerts.length) { alertCard.classList.add('hidden'); return; }
+      alertContent.innerHTML = alerts.map(a => {
+        const bg    = a.level === 'red'    ? 'rgba(239,68,68,0.12)'    : 'rgba(251,146,60,0.12)';
+        const border= a.level === 'red'    ? 'rgba(239,68,68,0.25)'    : 'rgba(251,146,60,0.25)';
+        const color = a.level === 'red'    ? '#fca5a5'                  : '#fed7aa';
+        const icon  = a.level === 'red'    ? '🔴'                       : '🟠';
+        return `<div style="display:flex;align-items:flex-start;gap:1rem;margin-top:0.75rem;padding:1rem 1.2rem;border-radius:14px;background:${bg};border:1px solid ${border};color:${color};">
+          <span style="font-size:1.3rem;flex-shrink:0;">${icon}</span>
+          <div><strong style="display:block;margin-bottom:0.25rem;">${escapeHtml(a.title)}</strong>${escapeHtml(a.message)}</div>
+        </div>`;
+      }).join('');
+      alertCard.classList.remove('hidden');
+    }
+
+    // ── FEATURE 1: Weather → AI Actionable Advice ────────────────────────────
+    async function fetchWeatherAdvice(lat, lon, crop) {
+      const loading = document.getElementById('aiAdviceLoading');
+      const summary = document.getElementById('aiAdviceSummary');
+      const actions = document.getElementById('aiAdviceActions');
+      loading.classList.remove('hidden');
+      actions.style.display = 'none';
+      summary.textContent = '';
+      try {
+        const res = await fetch('/api/weather-advice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat, lon, crop })
+        });
+        const data = await res.json();
+        if (!res.ok || data.status !== 'success') throw new Error(data.error || 'AI advice failed');
+        renderWeatherAdvice(data.advice);
+      } catch (e) {
+        summary.textContent = `⚠️ Could not load AI advice: ${e.message}`;
+      } finally {
+        loading.classList.add('hidden');
+      }
+    }
+
+    function _statusColor(val) {
+      if (val === 'good')     return { bg:'rgba(34,197,94,0.12)',  border:'rgba(34,197,94,0.25)',  text:'#86efac', label:'✅ Good' };
+      if (val === 'avoid')    return { bg:'rgba(239,68,68,0.12)',  border:'rgba(239,68,68,0.25)',  text:'#fca5a5', label:'🚫 Avoid' };
+      return                         { bg:'rgba(251,146,60,0.12)', border:'rgba(251,146,60,0.25)', text:'#fed7aa', label:'⚠️ Marginal' };
+    }
+
+    function renderWeatherAdvice(advice) {
+      const summary = document.getElementById('aiAdviceSummary');
+      const actions = document.getElementById('aiAdviceActions');
+      const doList  = document.getElementById('aiDoToday');
+      const avoidList = document.getElementById('aiAvoidToday');
+      const sprayBadge = document.getElementById('aiSprayBadge');
+      const fieldBadge = document.getElementById('aiFieldBadge');
+
+      const urgencyColor = advice.urgency === 'alert' ? '#fca5a5' : advice.urgency === 'caution' ? '#fed7aa' : '#86efac';
+      summary.innerHTML = `<span style="color:${urgencyColor};font-weight:600;">${escapeHtml(advice.summary || '')}</span>`;
+
+      doList.innerHTML = (advice.do_today || []).map(s =>
+        `<li style="padding:0.5rem 0.75rem;border-radius:10px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);color:#86efac;font-size:0.9rem;">✓ ${escapeHtml(s)}</li>`
+      ).join('');
+
+      avoidList.innerHTML = (advice.avoid_today || []).map(s =>
+        `<li style="padding:0.5rem 0.75rem;border-radius:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:#fca5a5;font-size:0.9rem;">✗ ${escapeHtml(s)}</li>`
+      ).join('');
+
+      const sc = _statusColor(advice.spray_window);
+      sprayBadge.style.cssText = `padding:0.75rem;border-radius:12px;text-align:center;background:${sc.bg};border:1px solid ${sc.border};color:${sc.text};`;
+      sprayBadge.innerHTML = `<strong style="display:block;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.25rem;">Spray window</strong>${sc.label}<br><small style="font-size:0.8rem;opacity:0.8;">${escapeHtml(advice.spray_reason || '')}</small>`;
+
+      const fc = _statusColor(advice.field_work);
+      fieldBadge.style.cssText = `padding:0.75rem;border-radius:12px;text-align:center;background:${fc.bg};border:1px solid ${fc.border};color:${fc.text};`;
+      fieldBadge.innerHTML = `<strong style="display:block;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.25rem;">Field work</strong>${fc.label}<br><small style="font-size:0.8rem;opacity:0.8;">${escapeHtml(advice.field_work_reason || '')}</small>`;
+
+      actions.style.display = 'block';
+    }
+
+    // ── FEATURE 2: Irrigation Decision ───────────────────────────────────────
+    async function fetchIrrigationAdvice(lat, lon, crop, soilType, cropStage) {
+      const irrigationCard = document.getElementById('irrigationCard');
+      const badge   = document.getElementById('irrigationDecisionBadge');
+      const details = document.getElementById('irrigationDetails');
+      irrigationCard.style.display = 'block';
+      badge.innerHTML   = '⏳ Calculating irrigation decision...';
+      badge.style.cssText = 'padding:1.2rem;border-radius:16px;text-align:center;background:rgba(255,255,255,0.04);color:#94a3b8;';
+      details.innerHTML = '';
+
+      try {
+        const res = await fetch('/api/irrigation-advice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat, lon, crop, soil_type: soilType, crop_stage: cropStage })
+        });
+        const data = await res.json();
+        if (!res.ok || data.status !== 'success') throw new Error(data.error || 'Irrigation advice failed');
+        renderIrrigationAdvice(data.irrigation);
+      } catch (e) {
+        badge.innerHTML = `⚠️ ${escapeHtml(e.message)}`;
+      }
+    }
+
+    function renderIrrigationAdvice(irr) {
+      const badge   = document.getElementById('irrigationDecisionBadge');
+      const details = document.getElementById('irrigationDetails');
+      const colorMap = {
+        irrigate: { bg:'rgba(59,130,246,0.15)',  border:'rgba(59,130,246,0.3)',  text:'#93c5fd', icon:'💧', label:'Irrigate' },
+        skip:     { bg:'rgba(34,197,94,0.12)',   border:'rgba(34,197,94,0.25)',  text:'#86efac', icon:'✅', label:'Skip irrigation' },
+        reduce:   { bg:'rgba(251,146,60,0.12)',  border:'rgba(251,146,60,0.25)', text:'#fed7aa', icon:'⬇️', label:'Reduce irrigation' }
+      };
+      const c = colorMap[irr.decision] || colorMap.skip;
+      badge.style.cssText = `padding:1.2rem;border-radius:16px;text-align:center;background:${c.bg};border:1px solid ${c.border};color:${c.text};`;
+      badge.innerHTML = `<div style="font-size:2rem;margin-bottom:0.4rem;">${c.icon}</div>
+        <strong style="font-size:1.1rem;">${c.label}</strong>
+        <div style="font-size:0.85rem;margin-top:0.25rem;opacity:0.8;">Confidence: ${irr.confidence}</div>`;
+      details.innerHTML = `
+        <p><strong>Reason:</strong> ${escapeHtml(irr.reason || '')}</p>
+        <p><strong>Best timing:</strong> ${escapeHtml(irr.timing || '—')}</p>
+        <p><strong>Water amount:</strong> ${escapeHtml(irr.amount || '—')}</p>
+        <p><strong>Next check:</strong> ${escapeHtml(irr.next_check || '—')}</p>
+        <p style="margin-top:0.75rem;padding:0.75rem;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.15);border-radius:10px;color:#93c5fd;">
+          💡 ${escapeHtml(irr.water_saving_tip || '')}
+        </p>`;
+    }
+
+    // ── FEATURE 3: Smart Crop Planning ───────────────────────────────────────
+    async function fetchCropPlanning(lat, lon, soilType) {
+      const cropPlanCard = document.getElementById('cropPlanCard');
+      const content = document.getElementById('cropPlanContent');
+      cropPlanCard.style.display = 'block';
+      content.innerHTML = '<p style="color:#94a3b8;text-align:center;">⏳ Generating crop plan...</p>';
+
+      try {
+        const res = await fetch('/api/crop-planning', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat, lon, soil_type: soilType, land_size_acres: 2 })
+        });
+        const data = await res.json();
+        if (!res.ok || data.status !== 'success') throw new Error(data.error || 'Crop planning failed');
+        renderCropPlan(data.plan);
+      } catch (e) {
+        content.innerHTML = `<p style="color:#fca5a5;">⚠️ ${escapeHtml(e.message)}</p>`;
+      }
+    }
+
+    function renderCropPlan(plan) {
+      const content = document.getElementById('cropPlanContent');
+      const suitColor = { excellent:'#86efac', good:'#93c5fd', moderate:'#fed7aa' };
+      const demandColor = { high:'#86efac', medium:'#93c5fd', low:'#fca5a5' };
+
+      const cropsHtml = (plan.top_crops || []).map((crop, i) => `
+        <div style="padding:1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;margin-bottom:0.75rem;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+            <strong style="font-size:1rem;color:#f8fafc;">${i+1}. ${escapeHtml(crop.name)}</strong>
+            <span style="font-size:0.8rem;padding:0.25rem 0.6rem;border-radius:999px;background:rgba(0,0,0,0.2);color:${suitColor[crop.suitability]||'#94a3b8'};">${crop.suitability}</span>
+          </div>
+          <p style="margin:0.4rem 0 0;color:#94a3b8;font-size:0.9rem;">${escapeHtml(crop.reason)}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.6rem;">
+            <span style="font-size:0.8rem;color:#94a3b8;">📅 ${escapeHtml(crop.sowing_window||'—')}</span>
+            <span style="font-size:0.8rem;color:#94a3b8;">⚖️ ${escapeHtml(crop.expected_yield||'—')}</span>
+            <span style="font-size:0.8rem;color:${demandColor[crop.market_demand]||'#94a3b8'};">📈 Market: ${crop.market_demand||'—'}</span>
+          </div>
+        </div>`).join('');
+
+      content.innerHTML = `
+        <p style="margin:0 0 1rem;color:#94a3b8;"><strong style="color:#f8fafc;">Season:</strong> ${escapeHtml(plan.season||'')}</p>
+        ${cropsHtml}
+        ${plan.avoid_crops && plan.avoid_crops.length ? `
+          <div style="margin-top:1rem;padding:0.75rem 1rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:12px;">
+            <strong style="color:#fca5a5;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;">Avoid this season</strong>
+            <ul style="margin:0.5rem 0 0;padding-left:1.2rem;color:#fca5a5;font-size:0.9rem;">${(plan.avoid_crops||[]).map(c=>`<li>${escapeHtml(c)}</li>`).join('')}</ul>
+          </div>` : ''}
+        ${plan.soil_prep_tip ? `
+          <p style="margin-top:0.75rem;padding:0.75rem 1rem;background:rgba(251,146,60,0.08);border:1px solid rgba(251,146,60,0.15);border-radius:12px;color:#fed7aa;font-size:0.9rem;">
+            🌍 <strong>Soil tip:</strong> ${escapeHtml(plan.soil_prep_tip)}
+          </p>` : ''}`;
+    }
+
+    // ── Button wiring ─────────────────────────────────────────────────────────
+    getAiBtn.addEventListener('click', async () => {
+      if (!_lastLat || !_lastLon) { alert('Please search a location first.'); return; }
+      const crop      = document.getElementById('cropInputField').value.trim() || 'general crop';
+      const soilType  = document.getElementById('soilTypeSelect').value;
+      const cropStage = document.getElementById('cropStageSelect').value;
+      await fetchWeatherAdvice(_lastLat, _lastLon, crop);
+      await fetchIrrigationAdvice(_lastLat, _lastLon, crop, soilType, cropStage);
+    });
+
+    getCropPlanBtn.addEventListener('click', async () => {
+      if (!_lastLat || !_lastLon) { alert('Please search a location first.'); return; }
+      const soilType = document.getElementById('soilTypeSelect').value;
+      await fetchCropPlanning(_lastLat, _lastLon, soilType);
+    });
+
+    // ── Utility functions ─────────────────────────────────────────────────────
+    function escapeHtml(text) {
+      const d = document.createElement('div'); d.textContent = String(text); return d.innerHTML;
+    }
+    function formatIsoTime(iso) {
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+    }
+    function formatWeekdayIso(iso) {
+      const d = new Date(iso + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { weekday:'short' });
+    }
+    function capitalize(text) {
+      if (!text) return ''; return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    function showError(message) {
+      const isKeyError = message.toLowerCase().includes('api key') || message.toLowerCase().includes('503') || message.toLowerCase().includes('not configured');
+      const hint = isKeyError
+        ? '<p style="color:#fbbf24;font-size:0.9rem;margin-top:0.5rem">⚠️ Check your API key in <code>.env</code> and restart the server.</p>' : '';
+      weatherSummary.innerHTML = `<p style="color:#fca5a5"><strong>Error:</strong> ${escapeHtml(message)}</p>${hint}`;
+      forecastGrid.innerHTML = '<div class="forecast-day">Unable to load forecast.</div>';
+      document.getElementById('aiAdviceSummary').textContent = 'Could not load location data.';
+      alertCard.classList.add('hidden');
+    }
+
+    // ── Event listeners ───────────────────────────────────────────────────────
+    searchBtn.addEventListener('click', () => {
+      const city = cityInput.value.trim();
+      if (!city) { showError('Please enter a city or village name.'); return; }
+      fetchWeatherByCity(city);
+    });
+    geoBtn.addEventListener('click', fetchWeatherByLocation);
+    cityInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchBtn.click(); });
+  </script>
+</body>
+</html>

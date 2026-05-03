@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | About</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    :root {
+      --bg: #020409;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --surface: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #fbbf24;
+      --accent-soft: rgba(251, 191, 36, 0.14);
+      --radius: 30px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, #020409 0%, #06111f 45%, #0b172b 100%);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+    }
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      backdrop-filter: blur(16px);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      font-size: 1.1rem;
+    }
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .nav-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      transition: transform 0.2s ease, background 0.2s ease;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      background: var(--accent-soft);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) 420px;
+      gap: 2rem;
+      margin-top: 2rem;
+      padding: 2.5rem;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+    }
+    .hero-copy h1 {
+      font-size: clamp(2.5rem, 4vw, 3.6rem);
+      margin-bottom: 1rem;
+      max-width: 11ch;
+    }
+    .hero-copy p {
+      color: var(--muted);
+      max-width: 640px;
+      font-size: 1.05rem;
+      margin-bottom: 1.75rem;
+    }
+    .hero-copy .hero-tags {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .tag-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: #e2e8f0;
+    }
+    .tag-card strong {
+      color: #fff;
+      font-size: 1rem;
+      display: block;
+    }
+    .hero-visual {
+      position: relative;
+      background: linear-gradient(180deg, rgba(251,191,36,0.18), rgba(255,255,255,0.03));
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.12);
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 1.5rem;
+    }
+    .hero-visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(251,191,36,0.22), transparent 28%);
+      border-radius: 28px;
+      pointer-events: none;
+    }
+    .hero-visual img {
+      width: 100%;
+      border-radius: 24px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+      position: relative;
+      z-index: 1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 26px;
+      padding: 1.6rem;
+      box-shadow: 0 18px 46px rgba(0,0,0,0.18);
+    }
+    .stat-card h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+    .stat-card p {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 0.95rem;
+    }
+    .content-section {
+      display: grid;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .panel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 26px;
+      padding: 1.75rem;
+      box-shadow: 0 22px 56px rgba(0,0,0,0.18);
+    }
+    .panel h2 {
+      margin-top: 0;
+      color: #ffffff;
+    }
+    .panel ul {
+      margin: 1rem 0 0;
+      padding-left: 1.35rem;
+      color: #cbd5e1;
+    }
+    .panel li {
+      margin-bottom: 0.8rem;
+    }
+    .feature-highlight {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 1.5rem;
+      transition: transform 0.25s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+    }
+    .feature-card h3 {
+      margin-bottom: 0.75rem;
+      color: #fff;
+    }
+    .feature-card p {
+      color: #cbd5e1;
+      margin: 0;
+    }
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .panel-grid { grid-template-columns: 1fr; }
+      .feature-highlight { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <small style="color: var(--accent); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem;">About AgriTech — Smart Crop Detective</small>
+        <h1>Technology that helps farmers protect crops, reduce waste, and grow smarter.</h1>
+        <p>AgriTech — Smart Crop Detective combines image analysis, disease intelligence, and weather-aware guidance to deliver actionable insights in a simple farmer-friendly interface.</p>
+
+        <div class="hero-tags">
+          <div class="tag-card">
+            <strong>Instant disease detection</strong>
+            <span>Capture crops and receive a clear diagnosis.</span>
+          </div>
+          <div class="tag-card">
+            <strong>Smart weather advice</strong>
+            <span>Plan sprays, irrigation, and harvesting on time.</span>
+          </div>
+          <div class="tag-card">
+            <strong>Actionable treatment</strong>
+            <span>Fertilizer, pesticide, and soil care recommendations.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80" alt="Smart farming dashboard" />
+      </div>
+    </section>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>25% Faster Decisions</h3>
+        <p>Farmers can act quicker with instant crop and soil guidance.</p>
+      </div>
+      <div class="stat-card">
+        <h3>4x More Accuracy</h3>
+        <p>AI-based detection improves disease identification and treatment timing.</p>
+      </div>
+      <div class="stat-card">
+        <h3>Weather-aware Alerts</h3>
+        <p>Recommended actions are adjusted for rain, heat, and humidity.</p>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <div class="panel-grid">
+        <div class="panel">
+          <h2>Our Mission</h2>
+          <p>Empower farmers with practical digital tools that bring precision agriculture to every field, reduce crop loss, and promote sustainable growth.</p>
+        </div>
+        <div class="panel">
+          <h2>Our Vision</h2>
+          <p>Build a resilient farming ecosystem where technology and traditional knowledge work together to produce healthier crops and stronger livelihoods.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Why AgriTech — Smart Crop Detective</h2>
+        <ul>
+          <li>Clear recommendations in simple language for easy farm adoption.</li>
+          <li>Integrated disease library and weather guidance in one platform.</li>
+          <li>Designed for real farming conditions with mobile-first usability.</li>
+          <li>Helps farmers stay ahead of problems before they become costly.</li>
+        </ul>
+      </div>
+
+      <div class="feature-highlight">
+        <div class="feature-card">
+          <h3>Faster disease alerts</h3>
+          <p>Detect symptoms early and get treatment guidance before the infection spreads.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Better crop planning</h3>
+          <p>Use weather-aware advice to avoid unnecessary pesticide spray and optimize irrigation.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Farmer-friendly interface</h3>
+          <p>Large icons, clear cards, and voice assistance help users operate easily in the field.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">AgriTech — Smart Crop Detective — intelligent farming for a more resilient tomorrow.</footer>
+  </div>
+  <script type="module">
+    import { renderNav } from './nav.js';
+    renderNav('about');
+  </script>
+</body>
+</html>

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Disease Library</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    body.body-gradient {
+      padding-top: 0;
+    }
+
+    .container {
+      padding-top: 0.75rem;
+    }
+
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.3rem 0;
+      background: rgba(12, 20, 35, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #f8fafc;
+      font-weight: 700;
+      background: linear-gradient(135deg, #111827, #1f2937);
+      border-radius: 999px;
+      padding: 0.9rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.22);
+    }
+
+    .brand span:first-child {
+      font-size: 1.35rem;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-link {
+      color: rgba(242, 242, 247, 0.9);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background: rgba(251, 191, 36, 0.95);
+      color: #0f172a;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(251, 191, 36, 0.24);
+    }
+
+    .search-section {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .search-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .search-header h1 {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #60a5fa, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .search-header p {
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 0.95rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 0.75rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+      padding: 0.85rem 1rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 1rem;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    .search-input::placeholder {
+      color: #67778f;
+    }
+
+    .search-input:focus {
+      color: var(--text);
+    }
+
+    .suggestions-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: none;
+      border-radius: 0 0 18px 18px;
+      max-height: 350px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      margin-top: 0.5rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .suggestions-dropdown.show {
+      display: block;
+    }
+
+    .suggestion-item {
+      padding: 1rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .suggestion-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-icon {
+      font-size: 1.2rem;
+    }
+
+    .suggestion-name {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .suggestion-type {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .disease-container {
+      margin-top: 2rem;
+    }
+
+    .disease-card {
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .disease-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .disease-icon {
+      font-size: 3rem;
+      min-width: 80px;
+      text-align: center;
+      background: rgba(96, 165, 250, 0.1);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+
+    .disease-title-group h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #f8fafc;
+    }
+
+    .disease-title-group p {
+      margin: 0.5rem 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .disease-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-block {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border-left: 4px solid var(--primary);
+    }
+
+    .info-block.symptoms {
+      border-left-color: #ef4444;
+    }
+
+    .info-block.treatment {
+      border-left-color: #22c55e;
+    }
+
+    .info-block.prevention {
+      border-left-color: #f59e0b;
+    }
+
+    .info-block.soil {
+      border-left-color: #8b5cf6;
+    }
+
+    .info-block h3 {
+      margin: 0 0 1rem;
+      font-size: 1.1rem;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-block ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-block li {
+      padding: 0.5rem 0;
+      color: var(--muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .info-block li:last-child {
+      border-bottom: none;
+    }
+
+    .info-block li:before {
+      content: "✓ ";
+      color: var(--success);
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
+
+    .disease-details {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .disease-details h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #f8fafc;
+      margin-bottom: 1rem;
+    }
+
+    .disease-details p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin: 0 0 1rem;
+      text-align: justify;
+    }
+
+    .disease-details p:last-child {
+      margin-bottom: 0;
+    }
+
+    .severity-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .severity-badge.medium {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+
+    .severity-badge.low {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .no-results p {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .no-results span {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+    }
+
+    @media (max-width: 760px) {
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .menu {
+        justify-content: center;
+      }
+      .disease-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .disease-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="body-gradient">
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="search-section">
+      <div class="search-header">
+        <h1>🔍 Disease Library</h1>
+        <p>Search and learn about crop diseases, their symptoms, treatments, and prevention methods. Type a disease name or browse our comprehensive database.</p>
+      </div>
+
+      <div class="search-wrapper">
+        <div class="search-input-group">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="#94a3b8">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search for a disease (e.g., powdery mildew, rust, blight)...">
+        </div>
+        <div class="suggestions-dropdown" id="suggestionsDropdown"></div>
+      </div>
+    </section>
+
+    <div class="disease-container" id="diseaseContainer"></div>
+
+    <footer class="site-footer">
+      <p>🌾 AgriTech — Smart Crop Detective — empowering farmers with disease knowledge and protection strategies.</p>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { renderNav } from './nav.js';
+    import { checkAuth } from './auth-guard.js';
+    checkAuth();
+    renderNav('library');
+  </script>
+  <script>
+    // Disease Database
+    const diseaseDatabase = [
+      {
+        id: 1,
+        name: "Early Leaf Spot",
+        searchTerms: ["early leaf spot", "leaf spot", "brown spot", "fungal spot"],
+        icon: "🍂",
+        severity: "high",
+        scientificName: "Alternaria solani / Cercospora species",
+        symptoms: [
+          "Brown to dark spots on leaf surface",
+          "Yellow halo around lesions",
+          "Spots coalesce and cause leaf yellowing",
+          "Premature leaf drop in severe cases"
+        ],
+        treatment: [
+          "Mancozeb 75% WP: 2kg/1000L water",
+          "Spray every 15 days during monsoon",
+          "Remove and destroy affected leaves",
+          "Improve air circulation by pruning",
+          "Chlorothalonil 50% WP alternative"
+        ],
+        prevention: [
+          "Use disease-resistant varieties",
+          "Maintain proper spacing between plants",
+          "Avoid overhead watering",
+          "Practice crop rotation (3-4 years)",
+          "Clean farm tools and equipment",
+          "Ensure proper sanitation in nursery"
+        ],
+        soil: [
+          "pH: 6.0-6.8",
+          "Well-draining loam soil",
+          "3-4% organic matter content",
+          "Avoid water stagnation",
+          "Mulching to prevent soil splash"
+        ],
+        description: "Early leaf spot is a fungal disease that primarily affects tomatoes, potatoes, and eggplants. It thrives in warm, humid conditions and can cause significant crop loss if left untreated."
+      },
+      {
+        id: 2,
+        name: "Powdery Mildew",
+        searchTerms: ["powdery mildew", "white powder", "mildew", "powdery fungus"],
+        icon: "❄️",
+        severity: "medium",
+        scientificName: "Erysiphaceae family",
+        symptoms: [
+          "White powdery coating on leaf surface",
+          "Usually appears on upper leaf surface first",
+          "Leaves become distorted and curl",
+          "Reduced photosynthesis capacity",
+          "Can spread to flowers and fruits"
+        ],
+        treatment: [
+          "Sulfur 80% WP: 3kg/1000L water",
+          "Spray at 10-day intervals",
+          "Potassium bicarbonate spray",
+          "Neem oil (3%) solution",
+          "Start treatment at first sign"
+        ],
+        prevention: [
+          "Ensure proper ventilation in field",
+          "Reduce nitrogen fertilizer application",
+          "Avoid overhead watering",
+          "Remove infected plant parts",
+          "Plant resistant varieties when available",
+          "Monitor regularly during cool nights"
+        ],
+        soil: [
+          "pH: 6.0-7.0",
+          "Sandy loam with good drainage",
+          "Well-aerated soil preferred",
+          "Moderate fertility level",
+          "Avoid soil compaction"
+        ],
+        description: "Powdery mildew is a common fungal disease affecting a wide range of crops. It's characterized by a white powder-like substance on plant surfaces and thrives in cool, dry conditions with high humidity."
+      },
+      {
+        id: 3,
+        name: "Leaf Rust",
+        searchTerms: ["leaf rust", "rust", "orange rust", "red rust", "wheat rust"],
+        icon: "🔴",
+        severity: "high",
+        scientificName: "Puccinia species",
+        symptoms: [
+          "Rust-colored pustules on leaf undersurface",
+          "Orange-red spots on upper leaf surface",
+          "Severe defoliation if untreated",
+          "Reduced grain fill in cereals",
+          "Can spread rapidly in cool, moist weather"
+        ],
+        treatment: [
+          "Propiconazole 25% EC: 1L/1000L water",
+          "Apply at first disease symptom",
+          "Hexaconazole 5% SC alternative",
+          "Repeat spray every 12-15 days",
+          "Avoid spraying during peak heat"
+        ],
+        prevention: [
+          "Use rust-resistant varieties",
+          "Improve air circulation through spacing",
+          "Avoid wetting foliage during irrigation",
+          "Clean field borders and remove grasses",
+          "Destroy crop residues after harvest",
+          "Apply fungicide preventively in humid seasons"
+        ],
+        soil: [
+          "pH: 5.5-7.0",
+          "Well-draining loamy soil",
+          "Moderate fertility preferred",
+          "Good potassium content essential",
+          "Balanced NPK ratio (15:15:20)"
+        ],
+        description: "Leaf rust is a serious fungal disease affecting cereals (wheat, barley, oats) and other crops. It causes rust-colored pustules on leaves and can lead to significant yield loss if not managed properly."
+      },
+      {
+        id: 4,
+        name: "Bacterial Leaf Blight",
+        searchTerms: ["bacterial blight", "leaf blight", "bacterial disease", "xanthomonas"],
+        icon: "🦠",
+        severity: "high",
+        scientificName: "Xanthomonas species",
+        symptoms: [
+          "Water-soaked lesions on leaf margins",
+          "Yellow halo around lesions",
+          "Lesions enlarge rapidly in wet conditions",
+          "Vein necrosis visible in advanced stages",
+          "Can cause complete leaf death"
+        ],
+        treatment: [
+          "Streptomycin 100 ppm spray",
+          "Copper oxychloride 50% WP: 2.5kg/1000L",
+          "Avoid overhead irrigation",
+          "Remove and burn infected leaves",
+          "Sterilize pruning tools with bleach"
+        ],
+        prevention: [
+          "Use disease-free seeds and planting material",
+          "Practice crop rotation (3-4 years)",
+          "Maintain proper plant spacing",
+          "Clean equipment between fields",
+          "Avoid working in wet fields",
+          "Control insects that transmit bacteria"
+        ],
+        soil: [
+          "pH: 6.0-7.0",
+          "Well-draining soil essential",
+          "Good organic matter (3-4%)",
+          "Avoid waterlogged conditions",
+          "Proper sanitation critical"
+        ],
+        description: "Bacterial leaf blight is caused by Xanthomonas species and affects many crops including rice, maize, and vegetables. It's a vascular disease that can devastate crops in warm, wet conditions."
+      },
+      {
+        id: 5,
+        name: "Plant Wilt (Fusarium)",
+        searchTerms: ["wilt", "fusarium wilt", "plant wilt", "verticillium", "wilting"],
+        icon: "🌾",
+        severity: "high",
+        scientificName: "Fusarium oxysporum",
+        symptoms: [
+          "Sudden wilting of leaves despite moist soil",
+          "Yellowing typically on one side of plant",
+          "Brown discoloration in vascular tissue",
+          "Progressive wilt from lower leaves upward",
+          "Plant death may occur rapidly"
+        ],
+        treatment: [
+          "No effective fungicide once established",
+          "Remove and destroy infected plants",
+          "Carbendazim 50% WP for soil drench (preventive)",
+          "Improve drainage immediately",
+          "Biological control with Trichoderma"
+        ],
+        prevention: [
+          "Use resistant varieties (VF/VFN rated)",
+          "Rotate crops with non-susceptible plants",
+          "Maintain proper soil drainage",
+          "Avoid soil compaction",
+          "Sanitize tools and equipment",
+          "Control soil-borne pathogens through solarization"
+        ],
+        soil: [
+          "pH: 6.5-7.0 (slightly alkaline reduces severity)",
+          "Excellent drainage critical",
+          "Add organic matter and compost",
+          "Avoid high nitrogen (predisposes to disease)",
+          "Consider soil solarization in summer"
+        ],
+        description: "Fusarium wilt is a soil-borne fungal disease that attacks the vascular system of plants, causing permanent wilting. It's difficult to control once established and prevention is key."
+      },
+      {
+        id: 6,
+        name: "Nitrogen Deficiency",
+        searchTerms: ["nitrogen deficiency", "n deficiency", "yellowing leaves", "stunted growth", "pale green"],
+        icon: "🟡",
+        severity: "medium",
+        scientificName: "Nutritional disorder",
+        symptoms: [
+          "Overall yellowing starting from older leaves",
+          "Pale green color throughout plant",
+          "Stunted plant growth",
+          "Poor leaf development",
+          "Reduced flowering and fruit set"
+        ],
+        treatment: [
+          "Apply urea 46% at 25-50kg/hectare",
+          "Foliar spray: Urea 2% solution",
+          "Apply in 2-3 split doses",
+          "Spray during cool morning hours",
+          "Use organic manure (FYM) as supplement"
+        ],
+        prevention: [
+          "Balanced fertilizer schedule",
+          "Apply NPK 10:26:26 at planting",
+          "Top dress with nitrogen at growth stages",
+          "Use legumes in crop rotation",
+          "Incorporate crop residues",
+          "Soil testing every 2-3 years"
+        ],
+        soil: [
+          "pH: 6.0-7.5 optimal",
+          "Add compost/FYM regularly",
+          "Increase organic matter",
+          "Avoid excessive leaching",
+          "Use slow-release fertilizers"
+        ],
+        description: "Nitrogen deficiency is one of the most common nutritional disorders in crops. It results in stunted growth and poor development. Regular soil testing and balanced nutrient management are essential."
+      },
+      {
+        id: 7,
+        name: "Iron Deficiency (Chlorosis)",
+        searchTerms: ["iron deficiency", "chlorosis", "interveinal chlorosis", "iron deficiency chlorosis", "yellowing veins green"],
+        icon: "🟢",
+        severity: "low",
+        scientificName: "Nutritional disorder - Iron",
+        symptoms: [
+          "Interveinal chlorosis (yellowing between veins)",
+          "Veins remain green while tissue yellows",
+          "Affects young leaves first",
+          "Can cause severe stunting if prolonged",
+          "May affect flowering and fruit quality"
+        ],
+        treatment: [
+          "Foliar spray: FeSO4 0.5% solution",
+          "Chelated iron spray (DTPA iron)",
+          "Soil application: FeSO4 25kg/hectare",
+          "Apply 2-3 times at 15-day intervals",
+          "Use micronutrient fertilizers"
+        ],
+        prevention: [
+          "Maintain soil pH 6.0-6.8",
+          "Avoid excessive lime application",
+          "Use iron-enriched fertilizers",
+          "Improve soil drainage",
+          "Regular soil and leaf testing",
+          "Apply organic matter to increase availability"
+        ],
+        soil: [
+          "pH: 6.0-6.8 (high pH reduces availability)",
+          "Add organic matter regularly",
+          "Ensure good drainage",
+          "Avoid waterlogged conditions",
+          "Use chelated iron sources"
+        ],
+        description: "Iron deficiency chlorosis is a common micronutrient deficiency, especially in high-pH soils. It's characterized by yellowing of leaves while veins remain green and can significantly reduce crop productivity."
+      },
+      {
+        id: 8,
+        name: "Downy Mildew",
+        searchTerms: ["downy mildew", "downy", "mildew blue", "pale spots", "grape mildew"],
+        icon: "💧",
+        severity: "medium",
+        scientificName: "Plasmopara viticola / Pseudoperonospora species",
+        symptoms: [
+          "Oil-soaked spots on upper leaf surface",
+          "White cottony fungal growth on leaf underside",
+          "Pale green to yellow spots on leaves",
+          "Affected leaves may curl and die",
+          "Can affect flowers and developing fruits"
+        ],
+        treatment: [
+          "Metalaxyl + Mancozeb combination spray",
+          "Apply 1.5-2kg/1000L water",
+          "Copper fungicides: Bordeaux mixture",
+          "Spray every 10-14 days in wet season",
+          "Ridomil Gold as systemic alternative"
+        ],
+        prevention: [
+          "Avoid overhead irrigation",
+          "Ensure proper plant spacing",
+          "Prune to improve air circulation",
+          "Mulch to prevent soil splash",
+          "Remove fallen leaves",
+          "Use resistant varieties when available"
+        ],
+        soil: [
+          "pH: 6.0-7.0",
+          "Well-drained soil critical",
+          "Good air drainage in field",
+          "Organic matter 3-4%",
+          "Avoid water stagnation"
+        ],
+        description: "Downy mildew is a wet-weather fungal disease that thrives in cool, humid conditions. It affects grapes, vegetables, and other crops. The fungus produces white growth on the underside of leaves."
+      }
+    ];
+
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsDropdown = document.getElementById('suggestionsDropdown');
+    const diseaseContainer = document.getElementById('diseaseContainer');
+
+    function debounce(fn, ms) {
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    function handleSearch(e) {
+      const query = e.target.value.toLowerCase().trim();
+      
+      if (query.length === 0) {
+        suggestionsDropdown.classList.remove('show');
+        displayAllDiseases();
+        return;
+      }
+
+      const filtered = diseaseDatabase.filter(disease =>
+        disease.name.toLowerCase().includes(query) ||
+        disease.searchTerms.some(term => term.includes(query))
+      );
+
+      if (filtered.length > 0) {
+        showSuggestions(filtered, query);
+        displayDiseases(filtered);
+      } else {
+        suggestionsDropdown.classList.remove('show');
+        diseaseContainer.innerHTML = `
+          <div class="no-results">
+            <span>🔍</span>
+            <p>No diseases found matching "${query}"</p>
+            <p style="font-size: 0.9rem; margin-top: 1rem;">Try searching for: leaf spot, rust, mildew, blight, or wilt</p>
+          </div>
+        `;
+      }
+    }
+
+    // Handle search input
+    searchInput.addEventListener('input', debounce(handleSearch, 300));
+
+    // Close dropdown on click outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-wrapper')) {
+        suggestionsDropdown.classList.remove('show');
+      }
+    });
+
+    function showSuggestions(diseases, query) {
+      suggestionsDropdown.innerHTML = diseases.map(disease => `
+        <div class="suggestion-item" onclick="selectDisease('${disease.name}')">
+          <span class="suggestion-icon">${disease.icon}</span>
+          <div>
+            <div class="suggestion-name">${disease.name}</div>
+            <div class="suggestion-type">${disease.scientificName}</div>
+          </div>
+        </div>
+      `).join('');
+      suggestionsDropdown.classList.add('show');
+    }
+
+    function selectDisease(diseaseName) {
+      searchInput.value = diseaseName;
+      suggestionsDropdown.classList.remove('show');
+      const disease = diseaseDatabase.find(d => d.name === diseaseName);
+      if (disease) {
+        displayDiseases([disease]);
+        disease.element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function displayDiseases(diseases) {
+      diseaseContainer.innerHTML = diseases.map(disease => `
+        <div class="disease-card">
+          <div class="disease-header">
+            <div class="disease-icon">${disease.icon}</div>
+            <div class="disease-title-group">
+              <h2>${disease.name}</h2>
+              <p><strong>Scientific Name:</strong> ${disease.scientificName}</p>
+            </div>
+            <div class="severity-badge ${disease.severity === 'high' ? '' : disease.severity === 'medium' ? 'medium' : 'low'}">
+              Severity: ${disease.severity.charAt(0).toUpperCase() + disease.severity.slice(1)}
+            </div>
+          </div>
+
+          <div class="disease-details">
+            <h3>📋 About This Disease</h3>
+            <p>${disease.description}</p>
+          </div>
+
+          <div class="disease-grid">
+            <div class="info-block symptoms">
+              <h3>🔍 Symptoms</h3>
+              <ul>
+                ${disease.symptoms.map(symptom => `<li>${symptom}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="info-block treatment">
+              <h3>💊 Treatment</h3>
+              <ul>
+                ${disease.treatment.map(treatment => `<li>${treatment}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="info-block prevention">
+              <h3>🛡️ Prevention</h3>
+              <ul>
+                ${disease.prevention.map(prevention => `<li>${prevention}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="info-block soil">
+              <h3>🌍 Soil Requirements</h3>
+              <ul>
+                ${disease.soil.map(soil => `<li>${soil}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function displayAllDiseases() {
+      diseaseContainer.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--muted);">
+          <p>📚 Browse our library or search for specific diseases</p>
+          <p style="font-size: 0.9rem;">Total diseases in database: ${diseaseDatabase.length}</p>
+        </div>
+      `;
+    }
+
+    // Display all diseases on page load
+    displayAllDiseases();
+  </script>
+</body>
+</html>

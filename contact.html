@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | Contact</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      background: rgba(34, 197, 94, 0.95);
+      color: #0f172a;
+      font-weight: 600;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="body-gradient">
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="hero">
+      <h1>Contact Us</h1>
+      <p>Get in touch with the AgriTech — Smart Crop Detective team. We're here to help with crop detection, disease identification, or farming advice.</p>
+
+      <div class="contact-form">
+        <h2>Send us a message</h2>
+        <form id="contactForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" required />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+          <button type="submit" class="btn" id="contactSubmit">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+    <div id="contactToast" class="toast" role="status" aria-live="polite">Message received — thank you!</div>
+
+    <footer class="site-footer">AgriTech — Smart Crop Detective — intelligent farming for a more resilient tomorrow.</footer>
+  </div>
+
+  <script type="module">
+    import { renderNav } from "./nav.js";
+    import { submitContact } from "./api.js";
+
+    renderNav("contact");
+
+    const form = document.getElementById("contactForm");
+    const toast = document.getElementById("contactToast");
+    const submitBtn = document.getElementById("contactSubmit");
+    if (!form) throw new Error("contactForm missing");
+
+    function showToast(ok, msg) {
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.style.background = ok ? "rgba(34,197,94,0.95)" : "rgba(239,68,68,0.95)";
+      toast.style.color = ok ? "#0f172a" : "#fff";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 4000);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        subject: document.getElementById("subject").value.trim(),
+        message: document.getElementById("message").value.trim(),
+      };
+      submitBtn.disabled = true;
+      try {
+        const { res, data } = await submitContact(payload);
+        if (!res.ok) {
+          showToast(false, data.error || "Something went wrong. Try again.");
+          return;
+        }
+        showToast(true, "Message received — thank you!");
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        showToast(false, "Could not reach the server. Is the app running?");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
