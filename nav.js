@@ -40,7 +40,7 @@ function addGoogleTranslate() {
   window.googleTranslateElementInit = function() {
     new google.translate.TranslateElement({
       pageLanguage: 'en',
-      includedLanguages: 'en,hi',
+      includedLanguages: 'en,hi,mr',
       autoDisplay: false
     }, 'google_translate_element');
   };
@@ -62,14 +62,18 @@ function addGoogleTranslate() {
     if (langSelect) {
       // Check current cookie
       const match = document.cookie.match(/googtrans=([^;]+)/);
-      if (match && (match[1] === '/en/hi' || match[1] === '/auto/hi')) {
+      if (match && (match[1] === '/en/mr' || match[1] === '/auto/mr')) {
+        langSelect.value = 'मराठी';
+      } else if (match && (match[1] === '/en/hi' || match[1] === '/auto/hi')) {
         langSelect.value = 'हिन्दी';
       } else {
         langSelect.value = 'English';
       }
 
       langSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'हिन्दी') {
+        if (e.target.value === 'मराठी') {
+          document.cookie = "googtrans=/en/mr; path=/";
+        } else if (e.target.value === 'हिन्दी') {
           document.cookie = "googtrans=/en/hi; path=/";
         } else {
           document.cookie = "googtrans=/en/en; path=/";

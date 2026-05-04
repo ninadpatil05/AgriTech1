@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriTech | My Profile</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    .profile-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2rem;
+      margin-top: 1.5rem;
+      max-width: 600px;
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: white;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+    .profile-title h2 {
+      margin: 0 0 0.25rem 0;
+      color: #f8fafc;
+      font-size: 1.5rem;
+    }
+    .profile-title p {
+      margin: 0;
+      color: #94a3b8;
+    }
+    .profile-details {
+      display: grid;
+      gap: 1.2rem;
+    }
+    .detail-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .detail-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .detail-value {
+      font-size: 1.1rem;
+      color: #e2e8f0;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-edit {
+      margin-top: 2rem;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+    }
+  </style>
+</head>
+<body class="body-gradient">
+  <div class="container">
+    <nav class="navbar">
+      <div id="nav-root"></div>
+    </nav>
+
+    <section class="hero">
+      <h1>My Profile</h1>
+      <p>Manage your account details and preferences.</p>
+
+      <div class="card profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">👨‍🌾</div>
+          <div class="profile-title">
+            <h2 id="userName">Farmer User</h2>
+            <p id="userRole">Verified Member</p>
+          </div>
+        </div>
+        
+        <div class="profile-details">
+          <div class="detail-group">
+            <span class="detail-label">Email Address</span>
+            <div class="detail-value" id="userEmail">farmer@example.com</div>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Phone Number</span>
+            <div class="detail-value" id="userPhone">+91 9876543210</div>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Location</span>
+            <div class="detail-value" id="userLocation">Maharashtra, India</div>
+          </div>
+        </div>
+
+        <button class="btn-edit" onclick="alert('Edit profile functionality coming soon!')">Edit Profile</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">AgriTech — Smart Crop Detective — intelligent farming for a more resilient tomorrow.</footer>
+  </div>
+
+  <script type="module">
+    import { renderNav } from "./nav.js";
+    import { checkAuth } from "./auth-guard.js";
+
+    checkAuth();
+    renderNav();
+  </script>
+</body>
+</html>
