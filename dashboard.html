@@ -1086,6 +1086,57 @@
         justify-content: space-between;
       }
     }
+    /* ── Analyzing spinner on home page ────────────────── */
+    #homeSpinner {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.5rem 1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+      color: #94a3b8;
+    }
+    .home-spin-circle {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top-color: #fbbf24;
+      animation: homeSpin 0.9s linear infinite;
+    }
+    @keyframes homeSpin { to { transform: rotate(360deg); } }
+
+    /* ── Non-plant warning card (home page) ────────────── */
+    .home-wrong-input {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.5rem 1.25rem;
+      background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(248,113,113,0.08));
+      border: 1.5px solid rgba(251,191,36,0.45);
+      border-radius: 16px;
+      text-align: center;
+      animation: hwiFadeIn 0.35s ease;
+    }
+    @keyframes hwiFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    .home-wrong-input .hwi-icon { font-size: 2.8rem; line-height: 1; }
+    .home-wrong-input .hwi-title { font-size: 1.05rem; font-weight: 700; color: #fbbf24; margin: 0; }
+    .home-wrong-input .hwi-msg { font-size: 0.92rem; color: #94a3b8; line-height: 1.6; margin: 0; }
+    .home-wrong-input .hwi-tips {
+      list-style: none; padding: 0; margin: 0.25rem 0 0;
+      display: flex; flex-direction: column; gap: 0.35rem; width: 100%; text-align: left;
+    }
+    .home-wrong-input .hwi-tips li {
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      font-size: 0.87rem; color: #94a3b8;
+      background: rgba(255,255,255,0.04); border-radius: 8px; padding: 0.4rem 0.6rem;
+    }
+
     .stats-section {
       margin-top: 2rem;
       padding: 1.75rem;
@@ -1225,6 +1276,15 @@
             <span class="indicator" data-slide="2"></span>
           </div>
         </div>
+
+        <!-- ── Spinner while API call is in progress ────── -->
+        <div id="homeSpinner">
+          <div class="home-spin-circle"></div>
+          <p style="margin:0;font-size:0.95rem;">Analyzing your crop image…</p>
+        </div>
+
+        <!-- ── Wrong-input warning (non-plant image) ─────── -->
+        <div id="homeWrongInput" style="display:none;"></div>
 
         <div id="analysisResult" class="analysis-result hidden">
           <h2>✅ Crop Analysis Result</h2>
@@ -1465,66 +1525,140 @@
       processCapturedImage(imageUrl);
     }
 
-    function processCapturedImage(imageUrl) {
-      if (resultPreview) {
-        resultPreview.src = imageUrl;
-      }
-      const analysis = getRandomAnalysis();
-      renderAnalysis(analysis);
+    // ── Helpers ──────────────────────────────────────────────────────
+    function escapeHtml(s) {
+      if (s == null) return '';
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
     }
 
-    function renderAnalysis(analysis) {
-      // Set the analysis text first
-      const moisturePercent = analysis.moisture;
-      const summary = `Detected disease: ${analysis.diseaseDetail}. Soil needs: ${analysis.soil}. Recommended fertilizer: ${analysis.fertilizer}. Suggested pesticide treatment: ${analysis.pesticide}. Moisture level is ${moisturePercent} percent. Recommendation: ${analysis.recommendation}`;
-      lastAnalysisText = summary;
-      
-      // Update UI elements
-      document.getElementById('diseaseText').textContent = analysis.diseaseDetail;
-      document.getElementById('soilText').textContent = analysis.soil;
-      document.getElementById('fertilizerText').textContent = analysis.fertilizer;
-      document.getElementById('pesticideText').textContent = analysis.pesticide;
-      document.getElementById('recommendationText').textContent = analysis.recommendation;
-      
-      document.getElementById('moisturePercent').textContent = moisturePercent + '%';
-      document.getElementById('moistureBar').style.width = moisturePercent + '%';
-      
-      let moistureStatus = '';
-      if (moisturePercent < 30) {
-        moistureStatus = 'Status: ⚠️ Very Dry - Immediate watering required';
-      } else if (moisturePercent < 50) {
-        moistureStatus = 'Status: 🔴 Low - Increase watering frequency';
-      } else if (moisturePercent < 70) {
-        moistureStatus = 'Status: 🟡 Moderate - Continue regular watering';
-      } else {
-        moistureStatus = 'Status: ✅ Optimal - Perfect moisture level for growth';
+    function showHomeSpinner(show) {
+      const sp = document.getElementById('homeSpinner');
+      if (sp) sp.style.display = show ? 'flex' : 'none';
+    }
+
+    function showHomeWrongInput(msg) {
+      const el = document.getElementById('homeWrongInput');
+      if (!el) return;
+      el.style.display = 'block';
+      el.innerHTML = `
+        <div class="home-wrong-input">
+          <div class="hwi-icon">🌿❌</div>
+          <p class="hwi-title">No Crop Image Detected</p>
+          <p class="hwi-msg">${escapeHtml(msg || 'Please upload a clear photo of a crop leaf or plant.')}</p>
+          <ul class="hwi-tips">
+            <li>🌱 Take a close-up photo of the crop <strong>leaf</strong></li>
+            <li>💡 Make sure the leaf fills most of the frame</li>
+            <li>📷 Avoid blurry, dark, or distant shots</li>
+            <li>🚫 Do not upload selfies, landscapes, or non-plant images</li>
+          </ul>
+        </div>`;
+    }
+
+    function hideHomeWrongInput() {
+      const el = document.getElementById('homeWrongInput');
+      if (el) el.style.display = 'none';
+    }
+
+    function resetHomeResults() {
+      if (analysisResult) analysisResult.classList.add('hidden');
+      const vp = document.getElementById('voicePanel');
+      if (vp) vp.classList.add('hidden');
+      hideHomeWrongInput();
+    }
+
+    // ── Real API detection ────────────────────────────────────────────
+    async function analyzeImageBlob(blob, previewUrl) {
+      resetHomeResults();
+      showHomeSpinner(true);
+
+      if (resultPreview && previewUrl) {
+        resultPreview.src = previewUrl;
       }
-      document.getElementById('moistureStatus').textContent = moistureStatus;
-      
-      // Show results
-      if (analysisResult) {
-        analysisResult.classList.remove('hidden');
-        const voicePanel = document.getElementById('voicePanel');
-        if (voicePanel) {
-          voicePanel.classList.remove('hidden');
+
+      try {
+        const formData = new FormData();
+        formData.append('image', blob, blob.name || 'capture.jpg');
+        const res  = await fetch('/api/detect', { method: 'POST', body: formData });
+        const data = await res.json().catch(() => ({}));
+
+        showHomeSpinner(false);
+
+        // ── Non-plant / wrong input ──────────────────────────────────
+        if (res.status === 422 || data.status === 'not_plant' || data.error === 'not_plant') {
+          showHomeWrongInput(data.message);
+          return;
         }
-        analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // ── API error ─────────────────────────────────────────────────
+        if (!res.ok || data.status === 'error') {
+          showHomeWrongInput(data.error || data.message || 'Detection failed. Please try again.');
+          return;
+        }
+
+        // ── Successful detection ─────────────────────────────────────
+        const report = data.report || {};
+        const disease = data.disease_detected || 'Unknown';
+        const isHealthy = disease.toLowerCase().includes('healthy');
+        const conf = typeof data.confidence === 'number' ? data.confidence : parseFloat(data.confidence);
+        const pct = Number.isFinite(conf) ? Math.round(conf * 100) : 0;
+
+        document.getElementById('diseaseText').textContent =
+          (data.crop_type ? data.crop_type + ' — ' : '') + disease
+          + (pct ? ` (${pct}% confidence)` : '');
+        document.getElementById('soilText').textContent =
+          report.soil_requirements || 'Use AI Advice for soil recommendations.';
+        document.getElementById('fertilizerText').textContent =
+          report.recommended_fertilizers || 'Use AI Advice for fertilizer recommendations.';
+        document.getElementById('pesticideText').textContent =
+          report.pesticide_treatments || (isHealthy ? 'No treatment needed — plant looks healthy! 🌿' : 'Use AI Advice for treatment details.');
+        document.getElementById('recommendationText').textContent =
+          report.preventive_measures || report.additional_recommendations || 'See the full Detect page for detailed AI advice.';
+
+        // Moisture — not in API response; show a neutral placeholder
+        const moistureEl   = document.getElementById('moisturePercent');
+        const moistureBar  = document.getElementById('moistureBar');
+        const moistureStat = document.getElementById('moistureStatus');
+        if (moistureEl)   moistureEl.textContent   = '—';
+        if (moistureBar)  moistureBar.style.width   = '0%';
+        if (moistureStat) moistureStat.textContent  = 'Moisture data not available from image analysis.';
+
+        lastAnalysisText = `Detected on ${data.crop_type || 'crop'}: ${disease}. ${report.description || ''} ${report.preventive_measures || ''}`;
+
+        if (analysisResult) {
+          analysisResult.querySelector('h2').textContent = isHealthy ? '✅ Crop is Healthy!' : '⚠️ Disease Detected';
+          analysisResult.classList.remove('hidden');
+        }
+        const vp = document.getElementById('voicePanel');
+        if (vp) vp.classList.remove('hidden');
+        analysisResult && analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        showHomeSpinner(false);
+        showHomeWrongInput('Network error — please check your connection and try again.');
       }
+    }
+
+    function processCapturedImage(imageUrl) {
+      // imageUrl is a data URL from canvas; convert to blob then call API
+      fetch(imageUrl)
+        .then(r => r.blob())
+        .then(blob => {
+          const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+          analyzeImageBlob(file, imageUrl);
+        });
     }
 
     function handlePhotoInput(event) {
       const file = event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target.result;
-        if (resultPreview) {
-          resultPreview.src = imageUrl;
-        }
-        const analysis = getRandomAnalysis();
-        renderAnalysis(analysis);
-      };
-      reader.readAsDataURL(file);
+      
+      // Reset input value so same file can be selected again
+      event.target.value = '';
+      
+      const previewUrl = URL.createObjectURL(file);
+      analyzeImageBlob(file, previewUrl);
     }
 
     function speakResult() {
@@ -1569,98 +1703,7 @@
       }
     }
 
-    // Sample crop analysis data - can be replaced with API call
-    const cropAnalysisData = [
-      {
-        disease: "Early Leaf Spot",
-        diseaseDetail: "Fungal infection causing brown spots with yellow halos on leaf surface",
-        soil: "pH: 6.0-6.8, Well-draining loam soil with 3-4% organic matter",
-        fertilizer: "NPK 19:19:19 at 50kg/hectare. Micronutrients: Zinc (5kg/ha), Iron (3kg/ha), Boron (2kg/ha)",
-        pesticide: "Mancozeb 75% WP: 2kg/1000L water. Spray every 15 days during monsoon",
-        moisture: 65,
-        recommendation: "Increase plant spacing to improve air circulation. Avoid overhead watering. Monitor daily for disease spread. Prune affected leaves."
-      },
-      {
-        disease: "Powdery Mildew",
-        diseaseDetail: "White powdery coating on leaf surface, reduces photosynthesis capacity",
-        soil: "pH: 6.0-7.0, Sandy loam with good drainage and aeration",
-        fertilizer: "NPK 12:32:16 at 40kg/hectare. Calcium (1000kg/ha), Magnesium (100kg/ha)",
-        pesticide: "Sulfur 80% WP: 3kg/1000L water. Spray at 10-day intervals starting early season",
-        moisture: 45,
-        recommendation: "Ensure proper ventilation. Reduce nitrogen fertilizer. Spray early morning. Remove infected plant parts."
-      },
-      {
-        disease: "Leaf Rust",
-        diseaseDetail: "Rust-colored pustules on leaf undersurface, severe defoliation if untreated",
-        soil: "pH: 5.5-7.0, Well-draining loamy soil with moderate fertility",
-        fertilizer: "NPK 15:15:20 at 60kg/hectare. Potassium is essential for disease resistance",
-        pesticide: "Propiconazole 25% EC: 1L/1000L water. Apply at first disease symptom",
-        moisture: 72,
-        recommendation: "Improve air circulation through pruning. Avoid wetting foliage. Apply fungicide preventively during humid seasons."
-      },
-      {
-        disease: "Healthy Leaf",
-        diseaseDetail: "No disease detected. Leaf shows excellent health with good color and texture",
-        soil: "pH: 6.2-6.8, Fertile loam soil with 4-5% organic matter",
-        fertilizer: "NPK 10:26:26 at 45kg/hectare for maintenance. Continue regular feeding schedule",
-        pesticide: "No treatment needed. Maintain preventive spray schedule as per seasonal calendar",
-        moisture: 70,
-        recommendation: "Maintain current watering schedule. Continue regular fertilizer application. Monitor for any early disease signs."
-      }
-    ];
 
-    function getRandomAnalysis() {
-      return cropAnalysisData[Math.floor(Math.random() * cropAnalysisData.length)];
-    }
-
-    function handlePhotoInput(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target.result;
-        if (resultPreview) {
-          resultPreview.src = imageUrl;
-        }
-        
-        // Get random analysis data
-        const analysis = getRandomAnalysis();
-        
-        // Update disease info
-        document.getElementById('diseaseText').textContent = analysis.diseaseDetail;
-        document.getElementById('soilText').textContent = analysis.soil;
-        document.getElementById('fertilizerText').textContent = analysis.fertilizer;
-        document.getElementById('pesticideText').textContent = analysis.pesticide;
-        document.getElementById('recommendationText').textContent = analysis.recommendation;
-        
-        // Update moisture level
-        const moisturePercent = analysis.moisture;
-        document.getElementById('moisturePercent').textContent = moisturePercent + '%';
-        document.getElementById('moistureBar').style.width = moisturePercent + '%';
-        
-        // Update moisture status
-        let moistureStatus = '';
-        if (moisturePercent < 30) {
-          moistureStatus = 'Status: ⚠️ Very Dry - Immediate watering required';
-        } else if (moisturePercent < 50) {
-          moistureStatus = 'Status: 🔴 Low - Increase watering frequency';
-        } else if (moisturePercent < 70) {
-          moistureStatus = 'Status: 🟡 Moderate - Continue regular watering';
-        } else {
-          moistureStatus = 'Status: ✅ Optimal - Perfect moisture level for growth';
-        }
-        document.getElementById('moistureStatus').textContent = moistureStatus;
-        
-        // Show results
-        if (analysisResult) {
-          analysisResult.classList.remove('hidden');
-          // Scroll to results
-          analysisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
 
     // Carousel functionality
     let currentSlide = 0;

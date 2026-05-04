@@ -114,6 +114,56 @@
       font-size: 1rem;
     }
 
+    /* ── Non-plant warning card ─────────────────────────────── */
+    .wrong-input-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.5rem 1.25rem;
+      background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(248,113,113,0.08));
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      border-radius: 16px;
+      text-align: center;
+      animation: fadeIn 0.35s ease;
+    }
+    .wrong-input-card .wi-icon {
+      font-size: 2.8rem;
+      line-height: 1;
+    }
+    .wrong-input-card .wi-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fbbf24;
+      margin: 0;
+    }
+    .wrong-input-card .wi-msg {
+      font-size: 0.93rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+    .wrong-input-card .wi-tips {
+      list-style: none;
+      padding: 0;
+      margin: 0.25rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      width: 100%;
+      text-align: left;
+    }
+    .wrong-input-card .wi-tips li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 0.4rem 0.6rem;
+    }
+
     #spinner {
       margin-top: 1.5rem;
       padding: 1.5rem 1rem;
@@ -825,10 +875,30 @@
 
       try {
         const { res, data } = await detectApi(formData);
-        const errText   = data.error || data.message || "Failed to analyze image.";
-        const isApiError = !res.ok || data.status === "error";
 
         if (spinner) spinner.classList.add("hidden");
+
+        // ── Non-plant / wrong input ──────────────────────────────────
+        if (res.status === 422 || data.status === "not_plant" || data.error === "not_plant") {
+          resultBox.innerHTML = `
+            <div class="wrong-input-card">
+              <div class="wi-icon">🌿❌</div>
+              <p class="wi-title">No Crop Image Detected</p>
+              <p class="wi-msg">${escapeHtml(data.message || "Please upload a photo of a crop leaf or plant.")}</p>
+              <ul class="wi-tips">
+                <li>🌱 Take a close-up photo of the crop <strong>leaf</strong></li>
+                <li>💡 Make sure the leaf fills most of the frame</li>
+                <li>📷 Avoid blurry, dark, or distant shots</li>
+                <li>🚫 Do not upload selfies, landscapes, or non-plant images</li>
+              </ul>
+            </div>`;
+          resultBox.style.display = "block";
+          return;
+        }
+
+        // ── Regular API error ────────────────────────────────────────
+        const errText   = data.error || data.message || "Failed to analyze image.";
+        const isApiError = !res.ok || data.status === "error";
 
         if (isApiError) {
           renderResult(null, true, errText);

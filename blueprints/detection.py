@@ -123,19 +123,23 @@ def _to_jpeg(img: Image.Image, max_px: int = 1024) -> bytes:
 _PROMPT = """\
 You are an expert agricultural plant disease detection AI (PlantVillage dataset).
 
-Examine the crop/plant image carefully.
+CRITICAL FIRST STEP — Is this image a photo of a crop leaf or plant?
+- If the image does NOT show a crop, plant, or leaf (e.g. it is a person, animal, object,
+  landscape, food, selfie, or anything non-plant), you MUST set "is_plant": false and leave
+  all other fields as empty strings / 0.0. Do NOT guess a class for non-plant images.
+- Only proceed to identify a disease class if the image clearly shows a plant/crop leaf.
 
-AVAILABLE DISEASE CLASSES — pick the single closest match:
+If it IS a plant image, choose the single closest match from the list below:
 {classes}
 
 Respond with VALID JSON ONLY (no markdown, no preamble):
 {{
   "is_plant": <true|false>,
-  "raw_class": "<exact class string from the list>",
-  "crop_type": "<human-readable crop name>",
-  "disease_name": "<human-readable disease, or 'Healthy (No Disease)'>",
-  "confidence": <0.0-1.0>,
-  "description": "<2-3 sentences: visible symptoms and reasoning>"
+  "raw_class": "<exact class string from the list, or empty string if not a plant>",
+  "crop_type": "<human-readable crop name, or empty string if not a plant>",
+  "disease_name": "<human-readable disease name, or empty string if not a plant>",
+  "confidence": <0.0-1.0, use 0.0 if not a plant>,
+  "description": "<2-3 sentences about visible symptoms, or empty string if not a plant>"
 }}"""
 
 
@@ -266,12 +270,18 @@ def detect():
         logger.error(f"Gemini call failed: {e}", exc_info=True)
         return jsonify({"error": f"Detection failed: {e}"}), 500
 
-    # Plant check
+    # Plant check — return HTTP 422 so frontend can show a special message
     if not analysis.get("is_plant", True):
+        logger.info("Non-plant image submitted — returning 422.")
         return jsonify({
-            "status": "error",
-            "message": "No plant detected. Please upload a clear photo of a crop leaf.",
-        })
+            "status": "not_plant",
+            "error": "not_plant",
+            "message": (
+                "This doesn't look like a crop or plant image. "
+                "Please upload a clear, close-up photo of a crop leaf or plant "
+                "for accurate disease detection."
+            ),
+        }), 422
 
     raw_class  = analysis.get("raw_class", "").strip()
     crop_name  = analysis.get("crop_type", "Unknown")
