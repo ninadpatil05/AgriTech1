@@ -320,6 +320,10 @@ body.light-mode .hero {
 }
 
 /* Utilities */
+#nav-root {
+  display: contents;
+}
+
 .hidden {
   display: none !important;
 }
