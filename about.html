@@ -326,6 +326,8 @@
   </div>
   <script type="module">
     import { renderNav } from './nav.js';
+    import { checkAuth } from './auth-guard.js';
+    checkAuth();
     renderNav('about');
   </script>
 </body>

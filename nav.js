@@ -7,6 +7,15 @@ export function renderNav(activePage) {
   if (!root) return;
 
   const brand = "AgriTech — Smart Crop Detective";
+
+  // On the login/register page, show only the brand — no protected links.
+  if (activePage === 'index') {
+    root.innerHTML = `
+      <a href="index.html" class="brand" title="${brand}"><span>🌱</span><span class="brand-text">${brand}</span></a>
+    `;
+    return;
+  }
+
   const items = [
     { id: "dashboard", href: "dashboard.html", label: "Home" },
     { id: "detect", href: "detect.html", label: "Detect Crop" },
@@ -20,7 +29,7 @@ export function renderNav(activePage) {
   const menuHtml = items
     .map(
       ({ id, href, label }) =>
-        `<a href="${href}" class="nav-link${id === activePage ? " active" : ""}">${label}</a>`
+        `<a href="${href}" class="nav-link${id === activePage ? " active" : ""}"><span>${label}</span></a>`
     )
     .join("");
 

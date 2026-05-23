@@ -70,6 +70,8 @@
   <script type="module">
     import { renderNav } from "./nav.js";
     import { submitContact } from "./api.js";
+    import { checkAuth } from "./auth-guard.js";
+    checkAuth();
 
     renderNav("contact");
 
